@@ -5,10 +5,10 @@
     
     <entry>
       <title>写在前面</title>
-      <link href="/2024/07/28/test/"/>
-      <url>/2024/07/28/test/</url>
+      <link href="/2024/07/28/preinfo/"/>
+      <url>/2024/07/28/preinfo/</url>
       
-        <content type="html"><![CDATA[<p>这是我个人的第一篇博客文章，本网站将不定期更新自己科研、生活上的点点滴滴，希望你能喜欢。</p>]]></content>
+        <content type="html"><![CDATA[<ol><li>这是我的个人博客，本网站将不定期更新自己科研、生活上的点点滴滴，希望你能喜欢。</li><li>网页分为“黑&#x2F;白”两种模式可供选择，右下角设置键可以修改模式。</li><li>本网页目前评论功能只支持拥有github账号的访客使用，评论时请使用自己的github账号登录，注意评论文明，感谢你的浏览(❤ ω ❤)。</li></ol>]]></content>
       
       
       <categories>
