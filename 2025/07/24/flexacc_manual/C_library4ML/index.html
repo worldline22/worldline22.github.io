@@ -1,0 +1,368 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>C Library for ML in FlexACC | Yuchao's Homepage</title><meta name="author" content="Yuchao Qin"><meta name="copyright" content="Yuchao Qin"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="A guide to FlexAcc c function kernels">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C Library for ML in FlexACC">
+<meta property="og:url" content="http://example.com/2025/07/24/flexacc_manual/C_library4ML/index.html">
+<meta property="og:site_name" content="Yuchao&#39;s Homepage">
+<meta property="og:description" content="A guide to FlexAcc c function kernels">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Multi-Token_Prediction_%28DeepSeek%29_01.svg/2880px-Multi-Token_Prediction_%28DeepSeek%29_01.svg.png">
+<meta property="article:published_time" content="2025-07-24T19:00:00.000Z">
+<meta property="article:modified_time" content="2025-07-24T19:09:41.581Z">
+<meta property="article:author" content="Yuchao Qin">
+<meta property="article:tag" content="FlexAcc Kernel">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Multi-Token_Prediction_%28DeepSeek%29_01.svg/2880px-Multi-Token_Prediction_%28DeepSeek%29_01.svg.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/07/24/flexacc_manual/C_library4ML/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: true,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'C Library for ML in FlexACC',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-07-24 12:09:41'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/transpancy.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/image/profile.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Menu</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/life/"><i class="fa-fw fas fa-coffee"></i><span> Life</span></a></li><li><a class="site-page child" href="/science/"><i class="fa-fw fas fa-atom"></i><span> Research</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> Photo</span></a></li><li><a class="site-page child" href="/pku/"><i class="fa-fw fas fa-book-open"></i><span> 学在北大</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Multi-Token_Prediction_%28DeepSeek%29_01.svg/2880px-Multi-Token_Prediction_%28DeepSeek%29_01.svg.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Yuchao's Homepage"><img class="site-icon" src="/image/test.gif"/><span class="site-name">Yuchao's Homepage</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Menu</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/life/"><i class="fa-fw fas fa-coffee"></i><span> Life</span></a></li><li><a class="site-page child" href="/science/"><i class="fa-fw fas fa-atom"></i><span> Research</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> Photo</span></a></li><li><a class="site-page child" href="/pku/"><i class="fa-fw fas fa-book-open"></i><span> 学在北大</span></a></li></ul></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">C Library for ML in FlexACC</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-07-24T19:00:00.000Z" title="发表于 2025-07-24 12:00:00">2025-07-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-07-24T19:09:41.581Z" title="更新于 2025-07-24 12:09:41">2025-07-24</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer-Architecture/">Computer Architecture</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="C Library for ML in FlexACC"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>This library’s functions are all in C language. Please follow the guidance of interface definition. Remember that as to accelerate the computation and realize efficient SIMD operations, all value should be store in memory cache using vector-like store (such as actvec_t, vec_t, mat_t and etc.)</p>
+<h1 id="Convolutional-Operations"><a href="#Convolutional-Operations" class="headerlink" title="Convolutional Operations"></a>Convolutional Operations</h1><h2 id="conv2d"><a href="#conv2d" class="headerlink" title="conv2d"></a><code>conv2d</code></h2><p>In the part, we are going to introduce conv2d operation that may suitable for image related machine learning workloads. The funtion has inferface like:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">conv2d_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_base, <span class="type">vec_t</span> chess_storage(VM)* in_base, <span class="type">const</span> <span class="type">mat_t</span> chess_storage(WM)* weight_base,</span></span><br><span class="line"><span class="params">                              <span class="type">const</span> <span class="type">actvec_t</span> chess_storage(WM)* bias_vec, <span class="type">int</span> IN_H, <span class="type">int</span> IN_W, <span class="type">int</span> IN_C,</span></span><br><span class="line"><span class="params">                              <span class="type">int</span> OUT_C, <span class="type">int</span> K, <span class="type">int</span> STRIDE, <span class="type">int</span> PAD,</span></span><br><span class="line"><span class="params">                              <span class="type">int</span> mul_o, <span class="type">int</span> shf_o, <span class="type">int</span> apply_relu)</span> &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>out_base</strong>: the output memory start pointer for output matrix</p>
+</li>
+<li><p><strong>in_base</strong>: the input memory start pointer for input matrix</p>
+</li>
+<li><p><strong>weight_base</strong>: the weight start pointer</p>
+</li>
+<li><p><strong>bias_vec</strong>: the bias add memory start pointer</p>
+</li>
+<li><p><strong>IN_H, IN_W, IN_C</strong>: input data’s heigh, weight and channel numbers</p>
+</li>
+<li><p><strong>OUT_C, K</strong>: define the output channel and convolutional kernel size</p>
+</li>
+<li><p><strong>STRIDE, PAD</strong>: define the step size of moving the convolutional window across the input and padding extra pixels around the border of the input image</p>
+</li>
+<li><p><strong>mul_o, shf_o</strong>: define the optional quantization operation</p>
+</li>
+<li><p><strong>apply_relu</strong>: judge whether to add relu layer behind convolution computing.</p>
+</li>
+</ul>
+<p>The core function is defined as:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// --- 2D convolution with Fused ReLU ---</span></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">conv2d_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_base, <span class="type">vec_t</span> chess_storage(VM)* in_base, <span class="type">const</span> <span class="type">mat_t</span> chess_storage(WM)* weight_base,</span></span><br><span class="line"><span class="params">                              <span class="type">const</span> <span class="type">actvec_t</span> chess_storage(WM)* bias_vec, <span class="type">int</span> IN_H, <span class="type">int</span> IN_W, <span class="type">int</span> IN_C,</span></span><br><span class="line"><span class="params">                              <span class="type">int</span> OUT_C, <span class="type">int</span> K, <span class="type">int</span> STRIDE, <span class="type">int</span> PAD,</span></span><br><span class="line"><span class="params">                              <span class="type">int</span> mul_o, <span class="type">int</span> shf_o, <span class="type">int</span> apply_relu)</span> &#123; <span class="comment">// &lt;-- Changed to int</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> OUT_H = (IN_H - K + <span class="number">2</span> * PAD) / STRIDE + <span class="number">1</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> OUT_W = (IN_W - K + <span class="number">2</span> * PAD) / STRIDE + <span class="number">1</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> IN_C_TILES = IN_C / VSIZE;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> OUT_C_TILES = OUT_C / VSIZE;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> oh = <span class="number">0</span>; oh &lt; OUT_H; oh++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> ow = <span class="number">0</span>; ow &lt; OUT_W; ow++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> oc_tile = <span class="number">0</span>; oc_tile &lt; OUT_C_TILES; oc_tile++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">                <span class="type">actvec_t</span> act = bias_vec[oc_tile];</span><br><span class="line">                <span class="comment">// ... (Kernel loops and mat_vec_mul_add logic remains identical) ...</span></span><br><span class="line">                <span class="type">int</span> ih_start = -PAD + oh * STRIDE;</span><br><span class="line">                <span class="type">int</span> iw_start = -PAD + ow * STRIDE;</span><br><span class="line">                <span class="type">int</span> wh_start = max_(<span class="number">0</span>, PAD - oh * STRIDE);</span><br><span class="line">                <span class="type">int</span> ww_start = max_(<span class="number">0</span>, PAD - ow * STRIDE);</span><br><span class="line">                <span class="type">int</span> wh_end   = min_(K, IN_H - ih_start);</span><br><span class="line">                <span class="type">int</span> ww_end   = min_(K, IN_W - iw_start);</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> wh = wh_start; wh &lt; wh_end; wh++) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> ww = ww_start; ww &lt; ww_end; ww++) &#123;</span><br><span class="line">                        <span class="type">mat_t</span> <span class="title function_">chess_storage</span><span class="params">(WM)</span>* wx_ptr = (<span class="type">mat_t</span> chess_storage(WM)*)weight_base + oc_tile * (K * K * IN_C_TILES) + wh * (K * IN_C_TILES) + ww * (IN_C_TILES);</span><br><span class="line">                        <span class="type">int</span> ih = ih_start + wh;</span><br><span class="line">                        <span class="type">int</span> iw = iw_start + ww;</span><br><span class="line">                        <span class="type">vec_t</span> <span class="title function_">chess_storage</span><span class="params">(VM)</span>* x_ptr = (<span class="type">vec_t</span> chess_storage(VM)*)in_base + ih * (IN_W * IN_C_TILES) + iw * (IN_C_TILES);</span><br><span class="line">                        <span class="keyword">for</span> (<span class="type">int</span> ic_tile = <span class="number">0</span>; ic_tile &lt; IN_C_TILES; ic_tile++) &#123;</span><br><span class="line">                            act = mat_vec_mul_add(act, *wx_ptr, *x_ptr);</span><br><span class="line">                            wx_ptr++;</span><br><span class="line">                            x_ptr++;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// --- Quantization and Activation ---</span></span><br><span class="line">                <span class="comment">// QUANTIZATION</span></span><br><span class="line">                <span class="comment">// act = (act * mul_o) &gt;&gt; shf_o;</span></span><br><span class="line">                <span class="comment">// RELU ACTIVATION</span></span><br><span class="line">                <span class="keyword">if</span> (apply_relu) &#123;</span><br><span class="line">                    act = max_(act, <span class="type">actvec_t</span>(<span class="number">0</span>));</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// --- Store Output ---</span></span><br><span class="line">                <span class="type">vec_t</span> <span class="title function_">chess_storage</span><span class="params">(VM)</span>* o_ptr = (<span class="type">vec_t</span> chess_storage(VM)*)out_base + oh * (OUT_W * OUT_C_TILES) + ow * (OUT_C_TILES) + oc_tile;</span><br><span class="line">                *o_ptr = <span class="type">vec_t</span>(act);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="max-pooling"><a href="#max-pooling" class="headerlink" title="max_pooling"></a><code>max_pooling</code></h2><p>Pooling operation is also an important function that used in image tasks. Among all pooling functions, max pooling is an efficient and well-performed way to get a better results. The interface definition:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">max_pool_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_base, <span class="type">vec_t</span> chess_storage(VM)* in_base, </span></span><br><span class="line"><span class="params">                                <span class="type">int</span> IN_H, <span class="type">int</span> IN_W, <span class="type">int</span> C,</span></span><br><span class="line"><span class="params">                                <span class="type">int</span> K, <span class="type">int</span> STRIDE)</span> &#123;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>out_base</strong>: the output memory start pointer for output matrix</p>
+</li>
+<li><p><strong>in_base</strong>: the input memory start pointer for input matrix</p>
+</li>
+<li><p><strong>IN_H, IN_W, C</strong>: input data’s heigh, weight and channel numbers</p>
+</li>
+<li><p><strong>K, STRIDE</strong>: define the size of pooling window and the step size of moving the padding window across the input</p>
+</li>
+</ul>
+<p>The core function is defined as:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">max_pool_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_base, <span class="type">vec_t</span> chess_storage(VM)* in_base, </span></span><br><span class="line"><span class="params">                                <span class="type">int</span> IN_H, <span class="type">int</span> IN_W, <span class="type">int</span> C,</span></span><br><span class="line"><span class="params">                                <span class="type">int</span> K, <span class="type">int</span> STRIDE)</span> &#123;</span><br><span class="line">    <span class="comment">// Calculate output dimensions</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> OUT_H = (IN_H - K) / STRIDE + <span class="number">1</span>;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> OUT_W = (IN_W - K) / STRIDE + <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// Pre-calculate tile count</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> C_TILES = C / VSIZE;</span><br><span class="line">    <span class="comment">// Output Height</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> oh = <span class="number">0</span>; oh &lt; OUT_H; oh++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">        <span class="comment">// Output Width</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> ow = <span class="number">0</span>; ow &lt; OUT_W; ow++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">            <span class="comment">// Tiled Channels</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> c_tile = <span class="number">0</span>; c_tile &lt; C_TILES; c_tile++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">                <span class="comment">// Initialize a vector with the minimum possible scalar value.</span></span><br><span class="line">                <span class="comment">// This ensures the first comparison will always select a real value.</span></span><br><span class="line">                <span class="type">actvec_t</span> max_accumulator_act = <span class="number">-128</span>;</span><br><span class="line">                <span class="comment">// Kernel/Window Height</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="type">int</span> kh = <span class="number">0</span>; kh &lt; K; kh++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">                    <span class="comment">// Kernel/Window Width</span></span><br><span class="line">                    <span class="keyword">for</span> (<span class="type">int</span> kw = <span class="number">0</span>; kw &lt; K; kw++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">                        <span class="comment">// Calculate input coordinates</span></span><br><span class="line">                        <span class="type">int</span> ih = oh * STRIDE + kh;</span><br><span class="line">                        <span class="type">int</span> iw = ow * STRIDE + kw;</span><br><span class="line">                        <span class="comment">// Pointer to Input[ih][iw][c_tile]</span></span><br><span class="line">                        <span class="type">const</span> <span class="type">vec_t</span> <span class="title function_">chess_storage</span><span class="params">(VM)</span>* x_ptr = in_base +</span><br><span class="line">                                                 ih * (IN_W * C_TILES) +</span><br><span class="line">                                                        iw * (C_TILES) +</span><br><span class="line">                                                                 c_tile;</span><br><span class="line">                        <span class="comment">// Load the input vector and promote it to a wide accumulator vector</span></span><br><span class="line">                        <span class="type">actvec_t</span> current_val_act = (<span class="type">actvec_t</span>)* x_ptr;</span><br><span class="line">                        <span class="comment">// Perform element-wise vector maximum</span></span><br><span class="line">                        max_accumulator_act = max_(max_accumulator_act, current_val_act);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// --- Store Output ---</span></span><br><span class="line">                <span class="comment">// Calculate output address: &amp;Output[oh][ow][c_tile]</span></span><br><span class="line">                <span class="type">vec_t</span> <span class="title function_">chess_storage</span><span class="params">(VM)</span>* o_ptr = out_base +</span><br><span class="line">                                   oh * (OUT_W * C_TILES) +</span><br><span class="line">                                           ow * (C_TILES) +</span><br><span class="line">                                                    c_tile;</span><br><span class="line">                <span class="comment">// Convert the final wide max vector back to a narrow storage vector and store</span></span><br><span class="line">                *o_ptr = (<span class="type">vec_t</span>)max_accumulator_act;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="add-2-relu"><a href="#add-2-relu" class="headerlink" title="add_2_relu"></a><code>add_2_relu</code></h2><p>This block realize the shortcut path construction which is usually used in residual block. It adds two vectors and perform relu operation to finish the residual function. The I&#x2F;O interface:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">add_and_relu_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_data, <span class="type">const</span> <span class="type">vec_t</span> chess_storage(VM)* main_path,</span></span><br><span class="line"><span class="params">                                    <span class="type">const</span> <span class="type">vec_t</span> chess_storage(VM)* shortcut_path, <span class="type">int</span> num_vectors)</span> &#123;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>out_data</strong>: the output memory start pointer for output values</p>
+</li>
+<li><p><strong>main_path, shortcut_path</strong>: two path of a stage (main path usually have multiple conv2d operation while shortcut path usually do nothing)</p>
+</li>
+<li><p><strong>num_vectors</strong>: define how many vectors we need to do this function</p>
+</li>
+</ul>
+<p>The core function is defined as:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// --- Add and ReLU ---</span></span><br><span class="line"><span class="comment">// This function adds two vectors and applies ReLU to the result and is usually used in residual blocks.</span></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">add_and_relu_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_data, <span class="type">const</span> <span class="type">vec_t</span> chess_storage(VM)* main_path,</span></span><br><span class="line"><span class="params">                                    <span class="type">const</span> <span class="type">vec_t</span> chess_storage(VM)* shortcut_path, <span class="type">int</span> num_vectors)</span> &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; num_vectors; ++i) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">        <span class="comment">// Load both vectors and promote to wide accumulator type</span></span><br><span class="line">        <span class="type">actvec_t</span> main_act = <span class="type">actvec_t</span>(main_path[i]);</span><br><span class="line">        <span class="type">actvec_t</span> shortcut_act = <span class="type">actvec_t</span>(shortcut_path[i]);</span><br><span class="line">        <span class="comment">// Perform the addition</span></span><br><span class="line">        <span class="type">actvec_t</span> sum = main_act + shortcut_act;</span><br><span class="line">        <span class="type">actvec_t</span> result = max_(sum, <span class="type">actvec_t</span>(<span class="number">0</span>));</span><br><span class="line">        out_data[i] = <span class="type">vec_t</span>(result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="average-pooling"><a href="#average-pooling" class="headerlink" title="average_pooling"></a><code>average_pooling</code></h2><p>Besides max pooling, we can also use aveage pooling to enhance the output performance and stability of our networks. The interface:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">global_average_pool_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_vector, <span class="type">const</span> <span class="type">vec_t</span> chess_storage(VM)* in_base,</span></span><br><span class="line"><span class="params">                                           <span class="type">int</span> IN_H, <span class="type">int</span> IN_W, <span class="type">int</span> C)</span> &#123;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>out_vector</strong>: the output memory start pointer for output matrix</p>
+</li>
+<li><p><strong>in_base</strong>: the input memory start pointer for input matrix</p>
+</li>
+<li><p><strong>IN_H, IN_W, C</strong>: input data’s heigh, weight and channel numbers</p>
+</li>
+</ul>
+<p>The core function is defined as:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// --- Global Average Pooling ---</span></span><br><span class="line"><span class="comment">// This function computes the average of each channel across the spatial dimensions.</span></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">global_average_pool_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_vector, <span class="type">const</span> <span class="type">vec_t</span> chess_storage(VM)* in_base,</span></span><br><span class="line"><span class="params">                                           <span class="type">int</span> IN_H, <span class="type">int</span> IN_W, <span class="type">int</span> C)</span> &#123;</span><br><span class="line">    <span class="comment">// Pre-calculate tile count and the total number of pixels per feature map</span></span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> C_TILES = C / VSIZE;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> num_pixels = IN_H * IN_W;</span><br><span class="line">    <span class="comment">// Tiled Channels</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> c_tile = <span class="number">0</span>; c_tile &lt; C_TILES; c_tile++) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">        <span class="comment">// Initialize a wide vector accumulator to zeros</span></span><br><span class="line">        <span class="type">actvec_t</span> sum_accumulator = <span class="type">actvec_t</span>(<span class="number">0</span>);</span><br><span class="line">        <span class="comment">// Loop over all pixels in the feature maps for the current channel tile</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; num_pixels; ++i) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">            <span class="comment">// Calculate pointer to Input[pixel_i][c_tile]</span></span><br><span class="line">            <span class="comment">// We can treat the H and W dimensions as flattened for this operation.</span></span><br><span class="line">            <span class="type">const</span> <span class="type">vec_t</span> <span class="title function_">chess_storage</span><span class="params">(VM)</span>* x_ptr = in_base + i * C_TILES + c_tile;</span><br><span class="line">            sum_accumulator = sum_accumulator + <span class="type">actvec_t</span>(*x_ptr);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// --- Perform the Division ---</span></span><br><span class="line">        <span class="type">actvec_t</span> avg_vec = <span class="type">actvec_t</span>(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> lane = <span class="number">0</span>; lane &lt; VSIZE; ++lane) &#123;</span><br><span class="line">            <span class="comment">// Extract the sum for one channel</span></span><br><span class="line">            <span class="type">actsca_t</span> lane_sum = act_ext(sum_accumulator, lane);</span><br><span class="line">            <span class="comment">// Perform scalar division</span></span><br><span class="line">            <span class="type">actsca_t</span> lane_avg = (<span class="type">int</span>)lane_sum / num_pixels;</span><br><span class="line">            <span class="comment">// Update the average vector with the result</span></span><br><span class="line">            avg_vec = act_upd(avg_vec, (<span class="type">int</span>)lane_avg, lane);</span><br><span class="line">        &#125;</span><br><span class="line">        out_vector[c_tile] = <span class="type">vec_t</span>(avg_vec);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="fully-connected"><a href="#fully-connected" class="headerlink" title="fully_connected"></a><code>fully_connected</code></h2><p>The fully connected layer output the final results of the network and is worked. The I&#x2F;O interface:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">fully_connected_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_results, <span class="type">vec_t</span> chess_storage(VM)* in_vector,</span></span><br><span class="line"><span class="params">                                       <span class="type">const</span> <span class="type">mat_t</span> chess_storage(WM)* weight_base, <span class="type">const</span> <span class="type">actvec_t</span> chess_storage(WM)* bias_vec,</span></span><br><span class="line"><span class="params">                                       <span class="type">int</span> IN_FEATURES, <span class="type">int</span> OUT_FEATURES, <span class="type">int</span> mul_o, <span class="type">int</span> shf_o)</span> &#123;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><strong>out_results</strong>: the output memory start pointer for output matrix</p>
+</li>
+<li><p><strong>in_vector</strong>: the input memory start pointer for input matrix</p>
+</li>
+<li><p><strong>weight_base</strong>: the weight start pointer</p>
+</li>
+<li><p><strong>bias_vec</strong>: the bias add memory start pointer</p>
+</li>
+<li><p><strong>IN_FEATURE, OUT_FEATURE</strong>: the input and output size of the vector results</p>
+</li>
+<li><p><strong>mul_o, shf_o</strong>: define the optional quantization operation</p>
+</li>
+</ul>
+<p>The core function is defined as:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// --- Fully Connected Layer ---</span></span><br><span class="line"><span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">fully_connected_vectorized</span><span class="params">(<span class="type">vec_t</span> chess_storage(VM)* out_results, <span class="type">vec_t</span> chess_storage(VM)* in_vector,</span></span><br><span class="line"><span class="params">                                       <span class="type">const</span> <span class="type">mat_t</span> chess_storage(WM)* weight_base, <span class="type">const</span> <span class="type">actvec_t</span> chess_storage(WM)* bias_vec,</span></span><br><span class="line"><span class="params">                                       <span class="type">int</span> IN_FEATURES, <span class="type">int</span> OUT_FEATURES, <span class="type">int</span> mul_o, <span class="type">int</span> shf_o)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> IN_TILES = IN_FEATURES / VSIZE;</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> OUT_TILES_VEC = OUT_FEATURES / VSIZE; <span class="comment">// Number of full vector tiles</span></span><br><span class="line">    <span class="comment">// Process the bulk of the output features in chunks of VSIZE.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> out_tile = <span class="number">0</span>; out_tile &lt; OUT_TILES_VEC; ++out_tile) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">        <span class="comment">// Initialize accumulator with the bias for this output tile</span></span><br><span class="line">        <span class="type">actvec_t</span> act = bias_vec[out_tile];</span><br><span class="line">        <span class="comment">// Pointer to the start of the weights for this output tile</span></span><br><span class="line">        <span class="type">const</span> <span class="type">mat_t</span> <span class="title function_">chess_storage</span><span class="params">(WM)</span>* wx_ptr = weight_base + out_tile * IN_TILES;</span><br><span class="line">        <span class="type">const</span> <span class="type">vec_t</span> <span class="title function_">chess_storage</span><span class="params">(VM)</span>* x_ptr = in_vector;</span><br><span class="line">        <span class="comment">// Loop over the input features, performing mat_vec_mul_add</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> in_tile = <span class="number">0</span>; in_tile &lt; IN_TILES; ++in_tile) chess_loop_range(<span class="number">1</span>,) &#123;</span><br><span class="line">            act = mat_vec_mul_add(act, *wx_ptr, *x_ptr);</span><br><span class="line">            wx_ptr++;</span><br><span class="line">            x_ptr++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Apply final quantization</span></span><br><span class="line">        <span class="comment">// act = (act * mul_o) &gt;&gt; shf_o;</span></span><br><span class="line">        <span class="comment">// Extract the VSIZE scalar results and store them</span></span><br><span class="line">        out_results[out_tile] = <span class="type">vec_t</span>(act);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Yuchao Qin</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/07/24/flexacc_manual/C_library4ML/">http://example.com/2025/07/24/flexacc_manual/C_library4ML/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Yuchao's Homepage</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/FlexAcc-Kernel/">FlexAcc Kernel</a></div><div class="post_share"><div class="social-share" data-image="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Multi-Token_Prediction_%28DeepSeek%29_01.svg/2880px-Multi-Token_Prediction_%28DeepSeek%29_01.svg.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2025/07/02/asip_design_tool/asip_training_processor_modeling/" title="ASIP Designer Processor Modeling"><img class="cover" src="https://www.synopsys.com/dw/images/ds/asip-designer-flow-diagram.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">ASIP Designer Processor Modeling</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Valine</span><span id="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/image/profile.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Yuchao Qin</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/worldline22"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/worldline22" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:qinyuchao22@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #D44638;"></i></a><a class="social-icon" href="/image/myweixin.png" target="_blank" title="Wechat"><i class="fab fa-weixin" style="color: #7BB32E;"></i></a><a class="social-icon" href="https://x.com/worldline22" target="_blank" title="Twitter"><i class="fab fa-twitter" style="color: #1da1f2;"></i></a><a class="social-icon" href="https://www.facebook.com/profile.php?id=61561687587707" target="_blank" title="Facebook"><i class="fab fa-facebook" style="color: #3b5998;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Happy Chinese new year! 🎉🎉🎉</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Convolutional-Operations"><span class="toc-number">1.</span> <span class="toc-text">Convolutional Operations</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#conv2d"><span class="toc-number">1.1.</span> <span class="toc-text">conv2d</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#max-pooling"><span class="toc-number">1.2.</span> <span class="toc-text">max_pooling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#add-2-relu"><span class="toc-number">1.3.</span> <span class="toc-text">add_2_relu</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#average-pooling"><span class="toc-number">1.4.</span> <span class="toc-text">average_pooling</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#fully-connected"><span class="toc-number">1.5.</span> <span class="toc-text">fully_connected</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/07/24/flexacc_manual/C_library4ML/" title="C Library for ML in FlexACC"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Multi-Token_Prediction_%28DeepSeek%29_01.svg/2880px-Multi-Token_Prediction_%28DeepSeek%29_01.svg.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C Library for ML in FlexACC"/></a><div class="content"><a class="title" href="/2025/07/24/flexacc_manual/C_library4ML/" title="C Library for ML in FlexACC">C Library for ML in FlexACC</a><time datetime="2025-07-24T19:00:00.000Z" title="发表于 2025-07-24 12:00:00">2025-07-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/02/asip_design_tool/asip_training_processor_modeling/" title="ASIP Designer Processor Modeling"><img src="https://www.synopsys.com/dw/images/ds/asip-designer-flow-diagram.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ASIP Designer Processor Modeling"/></a><div class="content"><a class="title" href="/2025/07/02/asip_design_tool/asip_training_processor_modeling/" title="ASIP Designer Processor Modeling">ASIP Designer Processor Modeling</a><time datetime="2025-07-03T00:00:00.000Z" title="发表于 2025-07-02 17:00:00">2025-07-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/01/asip_design_tool/Introduction_to_asip_design/" title="Overview of ASIP design tool"><img src="https://www.synopsys.com/dw/images/ds/asip-designer-flow-diagram.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Overview of ASIP design tool"/></a><div class="content"><a class="title" href="/2025/07/01/asip_design_tool/Introduction_to_asip_design/" title="Overview of ASIP design tool">Overview of ASIP design tool</a><time datetime="2025-07-02T00:20:00.000Z" title="发表于 2025-07-01 17:20:00">2025-07-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/10/aboutMe/" title="Biography"><img src="https://worldline22.github.io/image/pinCover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Biography"/></a><div class="content"><a class="title" href="/2025/02/10/aboutMe/" title="Biography">Biography</a><time datetime="2025-02-10T20:00:00.000Z" title="发表于 2025-02-10 12:00:00">2025-02-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/07/28/preinfo/" title="写在前面（Preface）"><img src="https://th.bing.com/th/id/R.e69674a9db6acac7483d6a69111df212?rik=zYh7aAR6872GFQ&amp;riu=http%3a%2f%2fn.sinaimg.cn%2fsinacn00%2f605%2fw640h765%2f20180731%2fe839-hhacrcc8311426.jpg&amp;ehk=xCz4PpDP2t62S%2bC30z%2fg0fOXYWHne%2bKz7ly6cmS09Kc%3d&amp;risl=&amp;pid=ImgRaw&amp;r=0" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="写在前面（Preface）"/></a><div class="content"><a class="title" href="/2024/07/28/preinfo/" title="写在前面（Preface）">写在前面（Preface）</a><time datetime="2024-07-29T00:28:35.000Z" title="发表于 2024-07-28 17:28:35">2024-07-28</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Yuchao Qin</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a target="_blank" rel="noopener" href="https://worldline22.github.io">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script><script>(() => {
+  const disqus_config = function () {
+    this.page.url = 'http://example.com/2025/07/24/flexacc_manual/C_library4ML/'
+    this.page.identifier = '/2025/07/24/flexacc_manual/C_library4ML/'
+    this.page.title = 'C Library for ML in FlexACC'
+  }
+
+  const disqusReset = () => {
+    window.DISQUS && window.DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  btf.addGlobalFn('themeChange', disqusReset, 'disqus')
+
+  const loadDisqus = () =>{
+    if (window.DISQUS) disqusReset()
+    else {
+      const script = document.createElement('script')
+      script.src = 'https://.disqus.com/embed.js'
+      script.setAttribute('data-timestamp', +new Date())
+      document.head.appendChild(script)
+    }
+  }
+
+  const getCount = async() => {
+    try {
+      const eleGroup = document.querySelector('#post-meta .disqus-comment-count')
+      if (!eleGroup) return
+      const cleanedLinks = eleGroup.href.replace(/#post-comment$/, '')
+
+      const res = await fetch(`https://disqus.com/api/3.0/threads/set.json?forum=&api_key=&thread:link=${cleanedLinks}`,{
+        method: 'GET'
+      })
+      const result = await res.json()
+
+      const count = result.response.length ? result.response[0].posts : 0
+      eleGroup.textContent = count
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  if ('Valine' === 'Disqus' || !false) {
+    if (false) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+    else {
+      loadDisqus()
+      
+    }
+  } else {
+    window.loadOtherComment = loadDisqus
+  }
+})()</script><script>(() => {
+  const initGitalk = () => {
+    const gitalk = new Gitalk(Object.assign({
+      clientID: 'Ov23liX4NCpV2ZdkGR2S',
+      clientSecret: '0704901937de27f01f6057bd2c6c7992f40346a6',
+      repo: 'worldline22.github.io.gitalk',
+      owner: 'Yuchao Qin',
+      admin: ['Yuchao Qin'],
+      id: 'c82bbe820f9d33f075ec0deffb220a23',
+      updateCountCallback: commentCount
+    },null))
+
+    gitalk.render('gitalk-container')
+  }
+
+  const loadGitalk = async() => {
+    if (typeof Gitalk === 'function') initGitalk()
+    else {
+      await getCSS('https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.css')
+      await getScript('https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js')
+      initGitalk()
+    }
+  }
+  
+  const commentCount = n => {
+    const isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
+    if (isCommentCount) {
+      isCommentCount.textContent= n
+    }
+  }
+
+  if ('Valine' === 'Gitalk' || !false) {
+    if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
+    else loadGitalk()
+  } else {
+    window.loadOtherComment = loadGitalk
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
