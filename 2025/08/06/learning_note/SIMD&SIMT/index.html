@@ -1,0 +1,383 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="dark"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>SIMT vs. SIMD - Deconstructing Parallel Architectures | Yuchao's Homepage</title><meta name="author" content="Yuchao Qin"><meta name="copyright" content="Yuchao Qin"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#0d0d0d"><meta name="description" content="Why we choose SIMT-like strategy">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SIMT vs. SIMD - Deconstructing Parallel Architectures">
+<meta property="og:url" content="http://example.com/2025/08/06/learning_note/SIMD&SIMT/index.html">
+<meta property="og:site_name" content="Yuchao&#39;s Homepage">
+<meta property="og:description" content="Why we choose SIMT-like strategy">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads#/media/File:Vortex_microarchitecture.png">
+<meta property="article:published_time" content="2025-08-07T06:00:00.000Z">
+<meta property="article:modified_time" content="2025-08-07T05:58:31.724Z">
+<meta property="article:author" content="Yuchao Qin">
+<meta property="article:tag" content="Parallel Computing">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads#/media/File:Vortex_microarchitecture.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/08/06/learning_note/SIMD&amp;SIMT/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.13.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":true,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":false,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.1/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: true,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'SIMT vs. SIMD - Deconstructing Parallel Architectures',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2025-08-06 22:58:31'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/transpancy.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/image/profile.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Menu</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/life/"><i class="fa-fw fas fa-coffee"></i><span> Life</span></a></li><li><a class="site-page child" href="/science/"><i class="fa-fw fas fa-atom"></i><span> Research</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> Photo</span></a></li><li><a class="site-page child" href="/pku/"><i class="fa-fw fas fa-book-open"></i><span> 学在北大</span></a></li></ul></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads#/media/File:Vortex_microarchitecture.png')"><nav id="nav"><span id="blog-info"><a href="/" title="Yuchao's Homepage"><img class="site-icon" src="/image/test.gif"/><span class="site-name">Yuchao's Homepage</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> Menu</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/life/"><i class="fa-fw fas fa-coffee"></i><span> Life</span></a></li><li><a class="site-page child" href="/science/"><i class="fa-fw fas fa-atom"></i><span> Research</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> Photo</span></a></li><li><a class="site-page child" href="/pku/"><i class="fa-fw fas fa-book-open"></i><span> 学在北大</span></a></li></ul></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">SIMT vs. SIMD - Deconstructing Parallel Architectures</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-08-07T06:00:00.000Z" title="发表于 2025-08-06 23:00:00">2025-08-06</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-08-07T05:58:31.724Z" title="更新于 2025-08-06 22:58:31">2025-08-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Computer-Architecture/">Computer Architecture</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="SIMT vs. SIMD - Deconstructing Parallel Architectures"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h1><p>The relentless pursuit of computational power has led to the dominance of parallel computing architectures. Among these, Single Instruction, Multiple Threads (SIMT) has emerged as the cornerstone of modern General-Purpose Graphics Processing Units (GPGPUs), offering a powerful blend of performance and programmability. This report delves into the SIMT paradigm, contrasting it with the more traditional Single Instruction, Multiple Data (SIMD) model to highlight its architectural nuances and superior flexibility.</p>
+<h1 id="The-Essence-of-SIMT"><a href="#The-Essence-of-SIMT" class="headerlink" title="The Essence of SIMT"></a>The Essence of SIMT</h1><p>The SIMT architecture represents a significant evolution in parallel computing, enabling the massive parallelization that defines modern GPUs. At its core, SIMT allows a single instruction to be executed by a multitude of threads concurrently. While groups of threads (organized into “warps” or “wavefronts”) execute in lockstep, the architecture’s true power lies in its ability to allow individual threads to make independent decisions, a feature that dramatically enhances the programmability of the GPU. We will explore SIMT from both a hardware and a software (CUDA) perspective.</p>
+<h2 id="A-Hardware-Perspective-The-Hierarchy-of-Execution"><a href="#A-Hardware-Perspective-The-Hierarchy-of-Execution" class="headerlink" title="A Hardware Perspective: The Hierarchy of Execution"></a>A Hardware Perspective: The Hierarchy of Execution</h2><p>From a hardware viewpoint, the SIMT model is structured in a clear hierarchy:</p>
+<ul>
+<li><p><strong>CUDA Core (The Thread Processor)</strong>: At the lowest level is the individual processing unit, often called a CUDA core or Streaming Processor (SP). This is the fundamental execution unit that maps to a single thread in the software model. It has its own program counter and registers, enabling a degree of independent operation.</p>
+</li>
+<li><p><strong>Warp (The Core Group)</strong>: A group of threads, typically 32 in NVIDIA’s architecture, is bundled into a “warp.” The threads within a warp are dispatched together and execute the same instruction at any given time. This grouped execution is the “Single Instruction” part of SIMT. If all threads in a warp follow the same execution path, SIMT behaves much like a traditional SIMD system, achieving maximum hardware utilization.</p>
+</li>
+<li><p><strong>Streaming MultStreaming Multiprocessor (SM)</strong>: An SM is a larger unit composed of multiple CUDA cores, shared memory, and a warp scheduler. The scheduler’s role is crucial: it selects which warps are ready to execute and issues instructions to them. By managing and interleaving multiple warps, the SM can hide memory latency and keep the execution cores busy, maximizing overall throughput.</p>
+</li>
+</ul>
+<p><img src="https://en.wikipedia.org/wiki/Thread_block_(CUDA_programming)#/media/File:Software-Perspective_for_thread_block.jpg" alt="A diagram illustrating the relationship between software constructs (Grid, Block, Thread) and hardware units (Device, SM, Core)."></p>
+<h2 id="A-CUDA-Perspective-Programmable-Thread-Level-Control"><a href="#A-CUDA-Perspective-Programmable-Thread-Level-Control" class="headerlink" title="A CUDA Perspective: Programmable Thread-Level Control"></a>A CUDA Perspective: Programmable Thread-Level Control</h2><p>The programmability of the SIMT architecture is best illustrated through NVIDIA’s CUDA platform. Let’s examine a simple CUDA kernel that performs a conditional vector addition. This example highlights how individual threads can take different actions based on the data they are processing.</p>
+<p>The task is to add elements of two vectors, A and B, into a vector C, but only if the corresponding element in A exceeds a given threshold.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">__global__ <span class="type">void</span> <span class="title">conditional_vector_add</span><span class="params">(<span class="type">float</span> *A, <span class="type">float</span> *B, <span class="type">float</span> *C, <span class="type">int</span> n, <span class="type">float</span> threshold)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// Each thread calculates its unique global index</span></span><br><span class="line">    <span class="type">int</span> i = blockIdx.x * blockDim.x + threadIdx.x;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (i &lt; n) &#123;</span><br><span class="line">        <span class="comment">// Each thread independently evaluates the condition based on its data A[i]</span></span><br><span class="line">        <span class="keyword">if</span> (A[i] &gt; threshold) &#123;</span><br><span class="line">            <span class="comment">// This path is taken only by threads whose data meets the criterion</span></span><br><span class="line">            C[i] = A[i] + B[i];</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// This alternate path is taken by the remaining threads</span></span><br><span class="line">            C[i] = A[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>The critical element here is the if (A[i] &gt; threshold) statement. Each thread in a warp evaluates this condition for its assigned element A[i]. This allows for fine-grained, data-dependent control flow, a hallmark of SIMT’s flexibility.</p>
+<h1 id="SIMT-vs-SIMD-A-Tale-of-Two-Paradigms"><a href="#SIMT-vs-SIMD-A-Tale-of-Two-Paradigms" class="headerlink" title="SIMT vs. SIMD: A Tale of Two Paradigms"></a>SIMT vs. SIMD: A Tale of Two Paradigms</h1><p>The distinction between SIMT and SIMD is fundamental to understanding modern parallel processors.</p>
+<h2 id="SIMD-Rigid-Vectorization"><a href="#SIMD-Rigid-Vectorization" class="headerlink" title="SIMD: Rigid Vectorization"></a>SIMD: Rigid Vectorization</h2><p>In a traditional SIMD architecture, a single instruction operates on a vector of data. This is highly efficient for uniform, predictable workloads like image processing or simple linear algebra. However, handling control flow is cumbersome. To implement our conditional addition, a SIMD system would typically use masking:</p>
+<ul>
+<li><p><strong>Compare</strong>: An instruction compares all elements of vector A against the threshold, generating a bitmask (e.g., 1 for true, 0 for false).</p>
+</li>
+<li><p><strong>Masked Add</strong>: The addition A + B is performed, but the results are only written to memory locations where the corresponding bit in the mask is 1.</p>
+</li>
+<li><p><strong>Masked Move</strong>: A separate instruction might be needed to write A to the remaining locations.</p>
+</li>
+</ul>
+<p>This process is less intuitive and forces the programmer to think in terms of vector-wide operations and masks rather than simple thread-level logic. The hardware itself lacks the inherent flexibility to manage divergent paths automatically.</p>
+<h2 id="SIMT-Flexible-Thread-Level-Logic"><a href="#SIMT-Flexible-Thread-Level-Logic" class="headerlink" title="SIMT: Flexible Thread-Level Logic"></a>SIMT: Flexible Thread-Level Logic</h2><p>The SIMT architecture abstracts away this complexity. While the underlying hardware (the warp) still executes a single instruction at a time, it intelligently handles divergent paths. When the threads in a warp disagree on the outcome of the if statement (an event known as thread divergence), the hardware scheduler handles it gracefully:</p>
+<ul>
+<li><p><strong>DiverDivergence</strong>: The warp temporarily splits.</p>
+</li>
+<li><p><strong>Serialized Execution</strong>: All threads that took the if path execute their instructions while the else threads are temporarily paused (masked off by the hardware).</p>
+</li>
+<li><p><strong>Path Inversion</strong>: The scheduler then pauses the if threads and executes the instructions for the else path.</p>
+</li>
+<li><p><strong>Reconvergence</strong>: Once both paths are complete, all threads in the warp reconverge to the same execution stream.</p>
+</li>
+</ul>
+<p>Although this serialization introduces a performance penalty (as not all cores in the warp are doing useful work simultaneously), it vastly simplifies programming. The developer can write straightforward, intuitive code as if programming for a single thread, and the hardware automatically manages the underlying complexity of parallel execution.</p>
+<p>Key Differences Summarized</p>
+<table>
+<thead>
+<tr>
+<th align="left">Feature</th>
+<th align="left">SIMD</th>
+<th align="left">SIMT</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>Programming Model</strong></td>
+<td align="left">Explicit vectorization; programmer manages data parallelism directly.</td>
+<td align="left">Scalar programming for a single thread; hardware manages thread parallelism.</td>
+</tr>
+<tr>
+<td align="left"><strong>Control Flow</strong></td>
+<td align="left">Handled via explicit masking; cumbersome for complex, data-driven branches.</td>
+<td align="left">Handled via standard <code>if/else</code>, <code>while</code> loops; hardware manages thread divergence.</td>
+</tr>
+<tr>
+<td align="left"><strong>Flexibility</strong></td>
+<td align="left">Best for highly regular, predictable data. Struggles with irregular workloads.</td>
+<td align="left">Highly flexible; excels at complex algorithms with data-dependent branching.</td>
+</tr>
+<tr>
+<td align="left"><strong>Hardware Abstraction</strong></td>
+<td align="left">Low-level; programmer is aware of vector lanes and masks.</td>
+<td align="left">High-level; hardware abstracts the management of thread groups (warps).</td>
+</tr>
+</tbody></table>
+<h1 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h1><p>The SIMT architecture is a masterful compromise, combining the raw throughput of a data-parallel model like SIMD with the programmability and flexibility of a thread-parallel model. By providing an intuitive programming model where developers can write simple scalar code with complex control flow, CUDA and the underlying SIMT hardware unlock the immense power of the GPU for a wide range of general-purpose computing tasks. While SIMD remains effective for specialized, highly regular problems, the ability of SIMT to automatically handle thread divergence and complex logic has cemented its role as the dominant architecture in the world of high-performance parallel computing.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">Yuchao Qin</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/08/06/learning_note/SIMD&amp;SIMT/">http://example.com/2025/08/06/learning_note/SIMD&amp;SIMT/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">Yuchao's Homepage</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Parallel-Computing/">Parallel Computing</a></div><div class="post_share"><div class="social-share" data-image="https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads#/media/File:Vortex_microarchitecture.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2025/07/24/flexacc_manual/C_library4ML/" title="C Library for ML in FlexACC"><img class="cover" src="https://miro.medium.com/v2/resize:fit:4800/format:webp/1*qpfm51RWgHcNRdOXNonW-w.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">C Library for ML in FlexACC</div></div></a></div></nav><hr class="custom-hr"/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div><div class="comment-switch"><span class="first-comment">Valine</span><span id="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div><div><div id="gitalk-container"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/image/profile.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Yuchao Qin</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">6</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/worldline22"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/worldline22" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:qinyuchao22@gmail.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #D44638;"></i></a><a class="social-icon" href="/image/myweixin.png" target="_blank" title="Wechat"><i class="fab fa-weixin" style="color: #7BB32E;"></i></a><a class="social-icon" href="https://x.com/worldline22" target="_blank" title="Twitter"><i class="fab fa-twitter" style="color: #1da1f2;"></i></a><a class="social-icon" href="https://www.facebook.com/profile.php?id=61561687587707" target="_blank" title="Facebook"><i class="fab fa-facebook" style="color: #3b5998;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">Happy Chinese new year! 🎉🎉🎉</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Abstract"><span class="toc-number">1.</span> <span class="toc-text">Abstract</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#The-Essence-of-SIMT"><span class="toc-number">2.</span> <span class="toc-text">The Essence of SIMT</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#A-Hardware-Perspective-The-Hierarchy-of-Execution"><span class="toc-number">2.1.</span> <span class="toc-text">A Hardware Perspective: The Hierarchy of Execution</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#A-CUDA-Perspective-Programmable-Thread-Level-Control"><span class="toc-number">2.2.</span> <span class="toc-text">A CUDA Perspective: Programmable Thread-Level Control</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SIMT-vs-SIMD-A-Tale-of-Two-Paradigms"><span class="toc-number">3.</span> <span class="toc-text">SIMT vs. SIMD: A Tale of Two Paradigms</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SIMD-Rigid-Vectorization"><span class="toc-number">3.1.</span> <span class="toc-text">SIMD: Rigid Vectorization</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SIMT-Flexible-Thread-Level-Logic"><span class="toc-number">3.2.</span> <span class="toc-text">SIMT: Flexible Thread-Level Logic</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Conclusion"><span class="toc-number">4.</span> <span class="toc-text">Conclusion</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2025/08/06/learning_note/SIMD&amp;SIMT/" title="SIMT vs. SIMD - Deconstructing Parallel Architectures"><img src="https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads#/media/File:Vortex_microarchitecture.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SIMT vs. SIMD - Deconstructing Parallel Architectures"/></a><div class="content"><a class="title" href="/2025/08/06/learning_note/SIMD&amp;SIMT/" title="SIMT vs. SIMD - Deconstructing Parallel Architectures">SIMT vs. SIMD - Deconstructing Parallel Architectures</a><time datetime="2025-08-07T06:00:00.000Z" title="发表于 2025-08-06 23:00:00">2025-08-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/24/flexacc_manual/C_library4ML/" title="C Library for ML in FlexACC"><img src="https://miro.medium.com/v2/resize:fit:4800/format:webp/1*qpfm51RWgHcNRdOXNonW-w.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="C Library for ML in FlexACC"/></a><div class="content"><a class="title" href="/2025/07/24/flexacc_manual/C_library4ML/" title="C Library for ML in FlexACC">C Library for ML in FlexACC</a><time datetime="2025-07-24T19:00:00.000Z" title="发表于 2025-07-24 12:00:00">2025-07-24</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/02/asip_design_tool/asip_training_processor_modeling/" title="ASIP Designer Processor Modeling"><img src="https://www.synopsys.com/dw/images/ds/asip-designer-flow-diagram.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ASIP Designer Processor Modeling"/></a><div class="content"><a class="title" href="/2025/07/02/asip_design_tool/asip_training_processor_modeling/" title="ASIP Designer Processor Modeling">ASIP Designer Processor Modeling</a><time datetime="2025-07-03T00:00:00.000Z" title="发表于 2025-07-02 17:00:00">2025-07-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/07/01/asip_design_tool/Introduction_to_asip_design/" title="Overview of ASIP design tool"><img src="https://www.synopsys.com/dw/images/ds/asip-designer-flow-diagram.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Overview of ASIP design tool"/></a><div class="content"><a class="title" href="/2025/07/01/asip_design_tool/Introduction_to_asip_design/" title="Overview of ASIP design tool">Overview of ASIP design tool</a><time datetime="2025-07-02T00:20:00.000Z" title="发表于 2025-07-01 17:20:00">2025-07-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2025/02/10/aboutMe/" title="Biography"><img src="https://worldline22.github.io/image/pinCover.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Biography"/></a><div class="content"><a class="title" href="/2025/02/10/aboutMe/" title="Biography">Biography</a><time datetime="2025-02-10T20:00:00.000Z" title="发表于 2025-02-10 12:00:00">2025-02-10</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 - 2025 By Yuchao Qin</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div><div class="footer_custom_text">Hi, welcome to my <a target="_blank" rel="noopener" href="https://worldline22.github.io">blog</a>!</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.13.0"></script><script src="/js/main.js?v=4.13.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.33/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"><script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/copy-tex.min.js"></script><script>(() => {
+  document.querySelectorAll('#article-container span.katex-display').forEach(item => {
+    btf.wrap(item, 'div', { class: 'katex-wrap'})
+  })
+})()</script><script>(() => {
+  const initValine = () => {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  const loadValine = async () => {
+    if (typeof Valine === 'function') initValine()
+    else {
+      await getScript('https://cdn.jsdelivr.net/npm/valine@1.5.1/dist/Valine.min.js')
+      initValine()
+    }
+  }
+
+  if ('Valine' === 'Valine' || !false) {
+    if (false) btf.loadComment(document.getElementById('vcomment'),loadValine)
+    else setTimeout(loadValine, 0)
+  } else {
+    window.loadOtherComment = loadValine
+  }
+})()</script><script>(() => {
+  const disqus_config = function () {
+    this.page.url = 'http://example.com/2025/08/06/learning_note/SIMD&SIMT/'
+    this.page.identifier = '/2025/08/06/learning_note/SIMD&SIMT/'
+    this.page.title = 'SIMT vs. SIMD - Deconstructing Parallel Architectures'
+  }
+
+  const disqusReset = () => {
+    window.DISQUS && window.DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  btf.addGlobalFn('themeChange', disqusReset, 'disqus')
+
+  const loadDisqus = () =>{
+    if (window.DISQUS) disqusReset()
+    else {
+      const script = document.createElement('script')
+      script.src = 'https://.disqus.com/embed.js'
+      script.setAttribute('data-timestamp', +new Date())
+      document.head.appendChild(script)
+    }
+  }
+
+  const getCount = async() => {
+    try {
+      const eleGroup = document.querySelector('#post-meta .disqus-comment-count')
+      if (!eleGroup) return
+      const cleanedLinks = eleGroup.href.replace(/#post-comment$/, '')
+
+      const res = await fetch(`https://disqus.com/api/3.0/threads/set.json?forum=&api_key=&thread:link=${cleanedLinks}`,{
+        method: 'GET'
+      })
+      const result = await res.json()
+
+      const count = result.response.length ? result.response[0].posts : 0
+      eleGroup.textContent = count
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  if ('Valine' === 'Disqus' || !false) {
+    if (false) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+    else {
+      loadDisqus()
+      
+    }
+  } else {
+    window.loadOtherComment = loadDisqus
+  }
+})()</script><script>(() => {
+  const initGitalk = () => {
+    const gitalk = new Gitalk(Object.assign({
+      clientID: 'Ov23liX4NCpV2ZdkGR2S',
+      clientSecret: '0704901937de27f01f6057bd2c6c7992f40346a6',
+      repo: 'worldline22.github.io.gitalk',
+      owner: 'Yuchao Qin',
+      admin: ['Yuchao Qin'],
+      id: '2201359875e73d200ec3bebb9fdb4c2a',
+      updateCountCallback: commentCount
+    },null))
+
+    gitalk.render('gitalk-container')
+  }
+
+  const loadGitalk = async() => {
+    if (typeof Gitalk === 'function') initGitalk()
+    else {
+      await getCSS('https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.css')
+      await getScript('https://cdn.jsdelivr.net/npm/gitalk@1.8.0/dist/gitalk.min.js')
+      initGitalk()
+    }
+  }
+  
+  const commentCount = n => {
+    const isCommentCount = document.querySelector('#post-meta .gitalk-comment-count')
+    if (isCommentCount) {
+      isCommentCount.textContent= n
+    }
+  }
+
+  if ('Valine' === 'Gitalk' || !false) {
+    if (false) btf.loadComment(document.getElementById('gitalk-container'), loadGitalk)
+    else loadGitalk()
+  } else {
+    window.loadOtherComment = loadGitalk
+  }
+})()</script></div><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.13.0"></script></div></div></body></html>
