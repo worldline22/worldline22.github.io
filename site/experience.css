@@ -12,21 +12,23 @@ body[data-page=home] .site-header{border-color:var(--hero-line);color:var(--hero
 @media(max-width:370px){nav{gap:10px}.site-header{gap:10px;margin:0 5%}.wordmark{font-size:24px}.hero-meta{font-size:9px}.hero-title{font-size:38px}.hero-affiliation strong{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.reveal-ready{opacity:1;transform:none}.hero-title,.hero-intro{animation:none}.hero-title{filter:none}body{transition:none}}
 
-/* A quieter opening: independent content and illustration columns leave room to breathe. */
-body[data-page=home]:before{height:100svh;min-height:700px;background:linear-gradient(145deg,var(--hero-surface),var(--hero-deep))}
-.hero.hero-immersive{display:flex;flex-direction:column;align-items:stretch;height:auto;min-height:max(650px,calc(100svh - 84px));max-height:none;padding:0}
-.hero-stage{flex:1;display:grid;grid-template-columns:1fr 1.1fr;align-items:center;gap:8%;padding:70px 4% 80px}
+/* The main composition and its two lower-corner information blocks. */
+body[data-page=home]:before{height:100svh;min-height:760px;background:linear-gradient(145deg,var(--hero-surface),var(--hero-deep))}
+.hero.hero-immersive{display:flex;flex-direction:column;align-items:stretch;height:auto;min-height:max(620px,calc(100svh - 84px));max-height:none;padding:0}
+.hero-stage{flex:1;display:grid;grid-template-columns:1fr 1.15fr;align-items:center;gap:5%;min-height:0;padding:0}
 .hero-copy{position:relative;z-index:2}
-.hero-immersive .hero-title{font-size:clamp(48px,5.7vw,88px);line-height:1.08;letter-spacing:-.055em;margin:0;max-width:none;font-weight:500}
-.hero-immersive .hero-intro{position:static;max-width:none;margin-top:32px}
-.hero-intro p{font-size:18px;line-height:1.6;letter-spacing:-.02em;margin-bottom:22px;color:var(--hero-muted)}
-.hero-immersive .hero-affiliation{position:static;text-align:left;max-width:none;margin-top:44px;font-size:11px;line-height:1.85}
-.hero-affiliation strong{font-size:12px}
+.hero-immersive .hero-title{font-size:clamp(54px,6.5vw,100px);line-height:1.08;letter-spacing:-.055em;margin:0;max-width:none;font-weight:500}
 .architecture-art{min-width:0;align-self:center}
-.hero-immersive .visual{position:relative;inset:auto;width:100%;height:360px;max-width:none;overflow:hidden}
-.architecture-legend{display:flex;justify-content:center;gap:22px;margin:10px 0 0}
-.architecture-legend button{background:none;border:0;border-bottom:1px solid transparent;padding:5px 0;font-size:11px;color:var(--hero-muted);transition:color .2s,border-color .2s}
+.hero-immersive .visual{position:relative;inset:auto;width:100%;height:clamp(310px,calc(100svh - 400px),470px);max-width:none;overflow:hidden}
+.architecture-legend{display:flex;justify-content:center;gap:24px;margin:0}
+.architecture-legend button{background:none;border:0;border-bottom:1px solid transparent;padding:5px 0;font-size:12px;color:var(--hero-muted);transition:color .2s,border-color .2s}
 .architecture-legend button:hover,.architecture-legend button[aria-pressed=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.hero-details{display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:48px;padding:12px 0 26px;position:relative;z-index:2}
+.hero-immersive .hero-intro{position:static;max-width:none;margin:0;width:auto}
+.hero-intro p{font-size:clamp(19px,1.65vw,25px);line-height:1.55;letter-spacing:-.02em;margin-bottom:20px;color:var(--hero-muted)}
+.hero-cv{font-size:14px;gap:32px}
+.hero-immersive .hero-affiliation{position:static;text-align:right;max-width:none;margin:0;font-size:14px;line-height:1.85}
+.hero-affiliation strong{font-size:15px}
 .hero-immersive .hero-bottom{position:relative;bottom:auto;flex-shrink:0}
 body[data-page=home] .profile-section{padding-top:115px;padding-bottom:65px}
 body[data-page=home] .section{margin-bottom:110px}
@@ -34,32 +36,24 @@ body[data-page=home] .section{margin-bottom:110px}
 .project-network canvas{height:330px}
 .project-network figcaption{position:absolute;bottom:15px;left:18px;font-size:11px;color:var(--muted)}
 .project-network .motion-button{bottom:8px;right:12px;background:transparent}
-@media(min-width:1500px){.hero-stage{padding-right:8%;padding-left:8%}.hero-immersive .visual{height:420px}}
-@media(max-width:1000px){.hero-stage{gap:3%;padding:70px 0 80px;grid-template-columns:1fr 1.15fr}.hero-immersive .visual{height:330px}.hero-immersive .hero-title{font-size:clamp(46px,5.7vw,60px)}.hero-intro p{font-size:17px}}
+@media(min-width:1500px) and (min-height:900px){.hero-details{padding-bottom:44px}}
+@media(max-width:1000px){.hero-stage{gap:3%;grid-template-columns:1fr 1.15fr}.hero-immersive .hero-title{font-size:clamp(49px,6.5vw,65px)}.hero-immersive .hero-affiliation{font-size:13px}.hero-affiliation strong{font-size:14px}}
 @media(max-width:720px){
-  body[data-page=home]:before{height:880px;min-height:0}
+  body[data-page=home]:before{height:1080px;min-height:0}
   .hero.hero-immersive{min-height:0}
-  .hero-stage{grid-template-columns:1fr;gap:24px;padding:64px 0 36px}
-  .hero-immersive .hero-title{font-size:clamp(38px,10.5vw,58px);line-height:1.08}
-  .hero-immersive .hero-intro{margin-top:24px}
-  .hero-intro p{font-size:16px;margin-bottom:16px}
-  .hero-immersive .hero-affiliation{margin-top:30px;font-size:11px}
-  .hero-affiliation strong{font-size:12px}
-  .hero-immersive .visual{height:270px;margin:0;width:100%;max-width:none}
-  .architecture-legend{margin-top:0;gap:24px}
+  .hero-stage{grid-template-columns:1fr;gap:24px;min-height:0;padding:64px 0 24px}
+  .hero-immersive .hero-title{font-size:clamp(42px,11.8vw,64px);line-height:1.08}
+  .hero-immersive .visual{height:300px;margin:0;width:100%;max-width:none}
+  .architecture-legend{gap:24px}
+  .hero-details{grid-template-columns:1fr;gap:34px;padding:18px 0 32px}
+  .hero-intro p{font-size:18px;margin-bottom:16px}
+  .hero-cv{font-size:13px}
+  .hero-immersive .hero-affiliation{font-size:12px;text-align:right}
+  .hero-affiliation strong{font-size:13px}
+  .hero-affiliation span:last-child{display:block}
   .hero-immersive .hero-bottom{padding:18px 0}
   body[data-page=home] .profile-section{padding-top:75px;padding-bottom:45px}
   body[data-page=home] .section{margin-bottom:75px}
   .project-network canvas{height:270px}
   .project-network figcaption{font-size:10px;max-width:150px;bottom:10px}
 }
-
-@media(max-width:370px){.hero-immersive .hero-title{font-size:38px}}
-
-@media(min-width:721px){
-  .hero-stage{min-height:540px}
-  .hero-copy{align-self:center}
-  .hero-immersive .hero-intro{position:absolute;top:100%;left:0;margin-top:30px;width:100%}
-  .architecture-art .hero-affiliation{text-align:center;margin-top:28px}
-}
-@media(max-width:720px){.architecture-art .hero-affiliation{text-align:center;margin-top:28px}}

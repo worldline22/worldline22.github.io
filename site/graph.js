@@ -20,7 +20,7 @@ export function startGraph(canvas) {
   function draw() {
     const dark = document.documentElement.dataset.theme === 'dark';
     const active = hover || selected;
-    const scale = Math.min(width/6.3,height/5.5);
+    const scale = Math.min(width/6.3,height/4.2);
     const yaw = -.58 + smoothX*.12 + Math.sin(time*.09)*.025;
     const tilt = .58 + smoothY*.07;
     const cx = width*.5, cy = height*.56;
