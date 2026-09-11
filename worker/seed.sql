@@ -32,7 +32,7 @@ INSERT OR IGNORE INTO entries (id,kind,title,authors,summary,body,category,statu
 
 Anjunyi Fan, Xuejie Liu, Anji Liu, Qiuping Wu, Jiaqi Yang, Yuchao Qin, Guy Van den Broeck, Yitao Liang, and Bonan Yan. ESTroM: element-flow architecture for processing sparse tractable probabilistic models. Proceedings of the 32nd International Symposium on High-Performance Computer Architecture (HPCA), 2026.
 
-This publication is listed in my CV.','Computer architecture','HPCA · 2026','2026','Peking University','','public','0','2026-09-11T00:00:00.000Z');
+This publication is listed in my CV.','Computer architecture','HPCA · 2026','2026','Peking University','https://ieeexplore.ieee.org/document/11408463','public','0','2026-09-11T00:00:00.000Z');
 INSERT OR IGNORE INTO entries (id,kind,title,authors,summary,body,category,status,date,organization,url,visibility,position,updated_at) VALUES ('ras','paper','RAS','Yuchao Qin, Anjunyi Fan, and Bonan Yan','A bit-exact rANS accelerator for high-performance neural lossless compression.','## Lossless compression, from algorithm to architecture
 
 Working with Prof. Bonan Yan at Peking University, I designed an end-to-end workflow for a lossless-compression accelerator based on probabilistic circuits.
