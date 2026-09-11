@@ -1,0 +1,2 @@
+# Copy to worker/.dev.vars for local development; never commit the real file.
+GITHUB_CLIENT_SECRET=

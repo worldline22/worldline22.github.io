@@ -1,0 +1,113 @@
+{
+  "projects": [
+    {
+      "id": "hermes",
+      "title": "Hermes",
+      "summary": "Agentic optimization for foundation-model training, from FX graphs to Inductor fusion passes.",
+      "category": "AI systems",
+      "status": "Ongoing",
+      "date": "Mar 2026\u2013Present",
+      "organization": "ByteDance Seed",
+      "symbol": "\u2318",
+      "body": "## Agentic foundation-model training\n\nI am building Hermes, an agentic system that optimizes foundation-model training with torch.compile, as a research assistant working with Yanbo Liang and Tingfeng Ruan at ByteDance Seed.\n\n## Research directions\n\nThe work explores agents that automatically write and apply FX graph passes for graph-level optimization, author Inductor IR passes to discover new fusion patterns, and generate joint FX graphs for scheduling large-scale distributed training workloads.\n\nThis overview describes the work listed in my CV. Detailed results and implementation updates will be added when ready to share.",
+      "url": "",
+      "visibility": "public"
+    },
+    {
+      "id": "risc-v",
+      "title": "Five-stage RISC-V core",
+      "summary": "A pipelined RISC-V processor with branch prediction, awarded first prize in the China College IC Competition.",
+      "category": "Hardware design",
+      "status": "Course project",
+      "date": "",
+      "organization": "Peking University",
+      "symbol": "\u2317",
+      "body": "## Processor design\n\nI built a five-stage RISC-V CPU core with branch prediction. This project won first prize in the China College IC Competition.\n\nThe project repository contains the implementation.",
+      "url": "https://github.com/worldline22/DeepSleep",
+      "visibility": "public"
+    },
+    {
+      "id": "cnn-accelerator",
+      "title": "CNN accelerator tape-out",
+      "summary": "A convolutional neural network accelerator designed for a TSMC 180-nm process.",
+      "category": "Hardware design",
+      "status": "In development",
+      "date": "",
+      "organization": "Peking University",
+      "symbol": "\u229e",
+      "body": "## From accelerator design to silicon\n\nI am designing a CNN accelerator for tape-out in a TSMC 180-nm process.\n\nThe repository linked below contains the project work referenced in my CV.",
+      "url": "https://github.com/Gracfusie/CSCD",
+      "visibility": "public"
+    },
+    {
+      "id": "spmm",
+      "title": "Sparse matrix acceleration",
+      "summary": "A hardware accelerator for sparse matrix\u2013dense matrix multiplication using a high-level chip-design language.",
+      "category": "Hardware design",
+      "status": "Course project",
+      "date": "",
+      "organization": "Peking University",
+      "symbol": "\u22ee",
+      "body": "## Sparse computation\n\nI developed a hardware accelerator for sparse matrix\u2013dense matrix multiplication (SpMM) using a high-level chip-design language.\n\nThe project repository contains the implementation.",
+      "url": "https://github.com/worldline22/My_SpMM",
+      "visibility": "public"
+    },
+    {
+      "id": "fpga-placement",
+      "title": "FPGA detailed placement",
+      "summary": "An electronic design automation tool for detailed placement and wirelength optimization.",
+      "category": "Hardware design",
+      "status": "Course project",
+      "date": "",
+      "organization": "Peking University",
+      "symbol": "\u22a1",
+      "body": "## Optimizing physical design\n\nI developed an EDA tool for FPGA detailed placement and wirelength optimization.\n\nThe project repository contains the implementation.",
+      "url": "https://github.com/worldline22/FPGA_r_op",
+      "visibility": "public"
+    }
+  ],
+  "notes": [],
+  "papers": [
+    {
+      "id": "estrom",
+      "title": "ESTroM",
+      "summary": "Element-flow architecture for processing sparse tractable probabilistic models.",
+      "category": "Computer architecture",
+      "status": "HPCA \u00b7 2026",
+      "date": "2026",
+      "organization": "Peking University",
+      "visibility": "public",
+      "url": "",
+      "body": "## Publication\n\nAnjunyi Fan, Xuejie Liu, Anji Liu, Qiuping Wu, Jiaqi Yang, Yuchao Qin, Guy Van den Broeck, Yitao Liang, and Bonan Yan. ESTroM: element-flow architecture for processing sparse tractable probabilistic models. Proceedings of the 32nd International Symposium on High-Performance Computer Architecture (HPCA), 2026.\n\nThis publication is listed in my CV.",
+      "authors": "Anjunyi Fan, Xuejie Liu, Anji Liu, Qiuping Wu, Jiaqi Yang, Yuchao Qin, Guy Van den Broeck, Yitao Liang, and Bonan Yan"
+    },
+    {
+      "id": "ras",
+      "title": "RAS",
+      "summary": "A bit-exact rANS accelerator for high-performance neural lossless compression.",
+      "category": "Computer architecture",
+      "status": "Preprint \u00b7 2025",
+      "date": "Sep 2024\u2013Jun 2026",
+      "organization": "Peking University",
+      "symbol": "\u224b",
+      "body": "## Lossless compression, from algorithm to architecture\n\nWorking with Prof. Bonan Yan at Peking University, I designed an end-to-end workflow for a lossless-compression accelerator based on probabilistic circuits.\n\nI developed a bit-exact Python implementation of the rANS compression algorithm and proposed a parallel accelerator architecture to improve computational efficiency.\n\n## Publication\n\nYuchao Qin, Anjunyi Fan, and Bonan Yan. RAS: a bit-exact rANS accelerator for high-performance neural lossless compression. arXiv:2511.04684, 2025.",
+      "url": "https://arxiv.org/abs/2511.04684",
+      "visibility": "public",
+      "authors": "Yuchao Qin, Anjunyi Fan, and Bonan Yan"
+    },
+    {
+      "id": "chronomem",
+      "title": "ChronoMem",
+      "summary": "Memory-aware profiling and data placement for retention-constrained on-chip memories in ASIPs.",
+      "category": "Computer architecture",
+      "status": "Presented \u00b7 2025",
+      "date": "Jun 2025\u2013Jan 2026",
+      "organization": "Stanford University",
+      "symbol": "\u25a5",
+      "body": "## Understanding data lifetime\n\nAs part of the Stanford UGVR Program, I worked with Prof. Thierry Tambe on memory-aware profiling and optimization for application-specific instruction-set processors.\n\nI extended an ASIP design tool with profiling and logging capabilities, collected memory-access traces across designs and workloads, and analyzed architectural trade-offs.\n\nI also implemented multicore simulation and developed a profiling-driven optimizer for memory-aware algorithms and compilation.\n\n## Presentation\n\nYuchao Qin, Peijing Li, and Thierry Tambe. ChronoMem: evaluating data lifetime and optimizing data placement for retention constrained on-chip memories in ASIPs. Synopsys ASIP University Day, November 2025.",
+      "url": "https://www.synopsys.com/content/dam/synopsys/events/documents/asipunivday2025-yuchao-qin.pdf",
+      "visibility": "public",
+      "authors": "Yuchao Qin, Peijing Li, and Thierry Tambe"
+    }
+  ]
+}

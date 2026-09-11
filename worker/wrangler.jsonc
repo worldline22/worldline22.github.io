@@ -1,0 +1,13 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "yuchao-workspace",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-11",
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true, "html_handling": "none" },
+  "d1_databases": [{ "binding": "DB", "database_name": "yuchao-content", "database_id": "457b75d7-b0c2-4523-9d72-5079466289ab", "migrations_dir": "migrations" }],
+  "vars": {
+    "PUBLIC_SITE_URL": "https://worldline22.github.io",
+    "OWNER_GITHUB_ID": "112759137",
+    "GITHUB_CLIENT_ID": ""
+  }
+}
