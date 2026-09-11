@@ -1,4 +1,4 @@
-// Animated parametric toroidal surface. No images, video, or WebGL are required.
+// A 3D neural-network schematic with forward-propagating data and neuron activations.
 export function startGraph(canvas) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return () => {};
@@ -8,81 +8,95 @@ export function startGraph(canvas) {
   let paused = motion.matches, frame = 0, visible = true, time = 0;
   let pointerX = 0, pointerY = 0, smoothX = 0, smoothY = 0, last = 0;
   let width = 0, height = 0, dirty = true;
-  const bands = 36, steps = 112, surface = [];
-  for (let i = 0; i < bands; i++) {
-    const v = i / bands * Math.PI * 2;
-    const line = [];
-    for (let j = 0; j <= steps; j++) {
-      const u = j / steps * Math.PI * 2;
-      const radius = 1.35 + .45 * Math.cos(v + u * 2);
-      line.push([radius * Math.cos(u), radius * Math.sin(u), .45 * Math.sin(v + u * 2) + .13 * Math.sin(u * 3)]);
+  // Neurons occupy five separate planes in 3D. Connections only join adjacent layers.
+  const sizes = [4, 6, 8, 6, 3];
+  const names = ['INPUT', 'HIDDEN 01', 'HIDDEN 02', 'HIDDEN 03', 'OUTPUT'];
+  const layers = sizes.map((count,layer)=>Array.from({length:count},(_,i)=>({
+    x:(layer-2)*1.12, y:(i-(count-1)/2)*.35,
+    z:i%2===0?-.3:.3, layer, index:i
+  })));
+  const edges=[];
+  for(let layer=0;layer<layers.length-1;layer++){
+    for(const from of layers[layer])for(const to of layers[layer+1]){
+      edges.push({from,to,layer,signal:(from.index+to.index)%3===0});
     }
-    surface.push(line);
   }
-  // Deterministic, quiet particles give the mathematical form depth.
-  const stars = Array.from({length:85}, (_,i) => ({x:((i*137.508)%997)/997, y:((i*233.719)%991)/991, r:i%9===0?1.25:.55, phase:i*1.7}));
   function label() {
     button.textContent = paused ? 'Play motion ▷' : 'Pause motion Ⅱ';
     button.setAttribute('aria-label', paused ? 'Play animation' : 'Pause animation');
     button.setAttribute('aria-pressed',String(paused));
   }
   function draw() {
-    const dark = document.documentElement.dataset.theme === 'dark';
-    const small = width < 720;
-    const cx = width * (small ? .56 : .64) + smoothX * 18;
-    const cy = height * (small ? .46 : .55) + smoothY * 13;
-    const scale = Math.min(width * (small ? .43 : .28),height * .29);
-    const a = .62 + time * .075 + smoothX * .15;
-    const b = .9 + Math.sin(time * .15) * .13 + smoothY * .12;
-    ctx.clearRect(0,0,width,height);
-    const glow = ctx.createRadialGradient(cx,cy,5,cx,cy,scale*2.3);
-    glow.addColorStop(0,dark?'rgba(32,169,195,.10)':'rgba(52,169,179,.06)');
-    glow.addColorStop(.5,dark?'rgba(28,137,168,.065)':'rgba(75,170,180,.025)');
-    glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,width,height);
-    for (const star of stars) {
-      const alpha = (dark?.24:.13) * (.7+.3*Math.sin(time*.4+star.phase));
-      ctx.fillStyle=dark?`rgba(151,223,232,${alpha})`:`rgba(34,106,123,${alpha})`;
-      ctx.beginPath();ctx.arc(star.x*width,star.y*height,star.r,0,Math.PI*2);ctx.fill();
-    }
-    function project(p) {
-      const x=p[0]*Math.cos(a)+p[2]*Math.sin(a);
-      const z=-p[0]*Math.sin(a)+p[2]*Math.cos(a);
-      const y=p[1]*Math.cos(b)-z*Math.sin(b);
-      const depth=p[1]*Math.sin(b)+z*Math.cos(b);
-      const perspective=5.5/(5.5+depth);
+    const dark=document.documentElement.dataset.theme==='dark';
+    const small=width<720;
+    const cx=width*(small?.5:.715)+smoothX*9;
+    const cy=height*(small?.46:.45)+smoothY*7;
+    const scale=Math.min(width*(small?.16:.091),height*.16);
+    // Small camera movement preserves the readable input-to-output direction.
+    const yaw=-.28+Math.sin(time*.13)*.065+smoothX*.13;
+    const tilt=.13+Math.cos(time*.16)*.025+smoothY*.08;
+    const colors=dark?['99,207,220','106,183,237','144,160,241','134,198,225','113,229,203']:['14,126,146','28,106,165','82,97,175','28,119,155','14,137,110'];
+    const cycle=(time*.56)%5;
+    const project=p=>{
+      const x=p.x*Math.cos(yaw)+p.z*Math.sin(yaw);
+      const z=-p.x*Math.sin(yaw)+p.z*Math.cos(yaw);
+      const y=p.y*Math.cos(tilt)-z*Math.sin(tilt);
+      const depth=p.y*Math.sin(tilt)+z*Math.cos(tilt);
+      const perspective=7/(7+depth);
       return {x:cx+x*scale*perspective,y:cy+y*scale*perspective,z:depth,p:perspective};
-    }
-    const points=[];
-    surface.forEach((line,index)=>{
-      const projected=line.map(project);
-      ctx.beginPath();projected.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
-      ctx.strokeStyle=dark?`rgba(73,186,217,${index%4===0?.25:.10})`:`rgba(13,100,135,${index%4===0?.27:.12})`;
-      ctx.lineWidth=index%4===0?.9:.55;ctx.stroke();
-      projected.forEach((p,j)=>{if(j%2===0 && j<steps)points.push({...p,index,j});});
-      // Moving signals run along selected lines on the surface.
-      if(index%6===0){const k=Math.floor((time*.065+index/bands)%1*steps);const p=projected[k];ctx.beginPath();ctx.arc(p.x,p.y,1.9*p.p,0,Math.PI*2);ctx.fillStyle=dark?'#d9ffff':'#02677e';ctx.shadowBlur=dark?11:0;ctx.shadowColor='#4feeff';ctx.fill();ctx.shadowBlur=0;}
+    };
+    ctx.clearRect(0,0,width,height);
+    const glow=ctx.createRadialGradient(cx,cy,0,cx,cy,scale*3.3);
+    glow.addColorStop(0,dark?'rgba(35,148,181,.12)':'rgba(38,142,168,.06)');
+    glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,width,height);
+    // Faint layer planes make the depth visible without obscuring the neurons.
+    layers.forEach((layer,index)=>{
+      const x=layer[0].x, extent=(sizes[index]-1)*.175+.25;
+      const corners=[{x,y:-extent,z:-.48},{x,y:-extent,z:.48},{x,y:extent,z:.48},{x,y:extent,z:-.48}].map(project);
+      ctx.beginPath();corners.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();
+      ctx.fillStyle=`rgba(${colors[index]},${dark?.025:.035})`;ctx.fill();
+      ctx.strokeStyle=`rgba(${colors[index]},${dark?.14:.17})`;ctx.lineWidth=.65;ctx.stroke();
     });
-    points.sort((a,b)=>b.z-a.z).forEach(p=>{
-      const light=Math.max(.15,Math.min(1,(1.8-p.z)/3.6));
-      const highlight=p.index%6===0;
-      ctx.fillStyle=dark?`rgba(${highlight?'167,238,249':'65,168,208'},${.16+light*.7})`:`rgba(${highlight?'8,88,117':'29,125,149'},${.16+light*.64})`;
-      ctx.beginPath();ctx.arc(p.x,p.y,(highlight?.95:.65)*p.p,0,Math.PI*2);ctx.fill();
-    });
-    // A low, receding coordinate field visually anchors the floating surface.
-    const base=height*.79;
-    for(let row=0;row<13;row++){
-      ctx.beginPath();
-      for(let col=0;col<=70;col++){
-        const x=col/70*width;
-        const wave=Math.sin(col*.11+time*.18+row*.11)*8;
-        const y=base+row*row*.73+wave*(row/13);
-        col?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    const projected=layers.map(layer=>layer.map(project));
+    edges.forEach(edge=>{
+      const from=projected[edge.layer][edge.from.index],to=projected[edge.layer+1][edge.to.index];
+      ctx.beginPath();ctx.moveTo(from.x,from.y);ctx.lineTo(to.x,to.y);
+      ctx.strokeStyle=`rgba(${colors[edge.layer]},${dark?.18:.19})`;ctx.lineWidth=.6;ctx.stroke();
+      const progress=cycle-edge.layer;
+      if(edge.signal&&progress>=0&&progress<1){
+        const tail=Math.max(0,progress-.16);
+        const sx=from.x+(to.x-from.x)*progress,sy=from.y+(to.y-from.y)*progress;
+        ctx.beginPath();ctx.moveTo(from.x+(to.x-from.x)*tail,from.y+(to.y-from.y)*tail);ctx.lineTo(sx,sy);
+        ctx.strokeStyle=`rgba(${colors[edge.layer]},.75)`;ctx.lineWidth=1.5;ctx.stroke();
+        ctx.beginPath();ctx.arc(sx,sy,small?1.7:2.2,0,Math.PI*2);
+        ctx.fillStyle=dark?'#ddffff':'#087e98';ctx.shadowColor=`rgb(${colors[edge.layer]})`;ctx.shadowBlur=dark?10:0;ctx.fill();ctx.shadowBlur=0;
       }
-      ctx.strokeStyle=dark?`rgba(67,150,170,${.012+row*.004})`:`rgba(44,112,128,${.012+row*.003})`;
-      ctx.lineWidth=.6;ctx.stroke();
-    }
+    });
+    projected.flatMap((layer,index)=>layer.map(p=>({...p,layer:index}))).sort((a,b)=>b.z-a.z).forEach(p=>{
+      const distance=Math.abs(cycle-p.layer);
+      const activation=Math.max(0,1-distance/.45);
+      const radius=(small?3.5:4.8)*p.p;
+      const halo=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,radius*(3+activation));
+      halo.addColorStop(0,`rgba(${colors[p.layer]},${.2+activation*.3})`);halo.addColorStop(1,'transparent');
+      ctx.fillStyle=halo;ctx.beginPath();ctx.arc(p.x,p.y,radius*(3+activation),0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(p.x,p.y,radius,0,Math.PI*2);
+      ctx.fillStyle=dark?'#122d3c':'#e2f0f1';ctx.fill();
+      ctx.strokeStyle=`rgba(${colors[p.layer]},${.7+activation*.3})`;ctx.lineWidth=1.1+activation;ctx.stroke();
+      ctx.beginPath();ctx.arc(p.x,p.y,radius*.42,0,Math.PI*2);ctx.fillStyle=`rgba(${colors[p.layer]},${.75+activation*.25})`;ctx.fill();
+    });
+    // Clear stage labels describe the schematic rather than claiming a specific model.
+    ctx.textAlign='center';ctx.font='12px "DM Sans", sans-serif';
+    layers.forEach((layer,index)=>{
+      if(small&&index>0&&index<4)return;
+      const p=project({x:layer[0].x,y:1.72,z:0});
+      ctx.fillStyle=dark?'#9dbfc9':'#446970';ctx.fillText(names[index],p.x,p.y);
+    });
+    const left=project({x:-2.24,y:2.04,z:0}),right=project({x:2.24,y:2.04,z:0});
+    ctx.beginPath();ctx.moveTo(left.x,left.y);ctx.lineTo(right.x,right.y);ctx.lineTo(right.x-5,right.y-3);ctx.moveTo(right.x,right.y);ctx.lineTo(right.x-5,right.y+3);
+    ctx.strokeStyle=dark?'rgba(135,194,213,.3)':'rgba(40,114,138,.35)';ctx.lineWidth=.8;ctx.stroke();
     dirty=false;
   }
+
   function resize() {
     const rect=canvas.getBoundingClientRect();width=rect.width;height=rect.height;
     const dpr=Math.min(devicePixelRatio||1,1.75);
