@@ -8,4 +8,5 @@ dist/
 !.env.example
 .DS_Store
 tmp/
+.private/
 worker/wrangler.local.jsonc

@@ -28,6 +28,20 @@ export function validateEntry(input,id){
 }
 export async function handle(request,env,fetcher=fetch){
   const url=new URL(request.url),path=url.pathname;
+  if(path==='/auth/key' && request.method==='POST'){
+    if(request.headers.get('Origin')!==url.origin)return json({error:'Request origin was not verified.'},403);
+    if(!env.OWNER_ACCESS_KEY_HASH)return json({error:'Personal access has not been configured.'},503);
+    if(!request.headers.get('Content-Type')?.startsWith('application/json'))return json({error:'Send JSON content.'},415);
+    const reader=request.body?.getReader();if(!reader)return json({error:'Enter your access key.'},400);
+    let text='',size=0;while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>1024){await reader.cancel();return json({error:'Invalid access key.'},400);}text+=new TextDecoder().decode(value);}
+    let key;try{key=JSON.parse(text).key;}catch{return json({error:'Invalid request.'},400);}
+    if(typeof key!=='string'||!/^[a-f0-9]{64}$/.test(key))return json({error:'The access key is incorrect.'},401);
+    const digest=await hash(key);let difference=0;for(let i=0;i<64;i++)difference|=digest.charCodeAt(i)^(env.OWNER_ACCESS_KEY_HASH.charCodeAt(i)||0);
+    if(difference!==0||env.OWNER_ACCESS_KEY_HASH.length!==64)return json({error:'The access key is incorrect.'},401);
+    const session=random();await env.DB.batch([env.DB.prepare('DELETE FROM sessions WHERE expires_at < ?').bind(now()),env.DB.prepare('INSERT INTO sessions(token_hash,expires_at) VALUES(?,?)').bind(await hash(session),now()+604800)]);
+    return json({ok:true},200,{'Set-Cookie':cookie('__Host-yq_session',session,604800)});
+  }
+  if(path==='/signin'&&request.method==='GET')return secureAsset(await env.ASSETS.fetch(new Request(new URL('/signin.html',url),request)));
   // Public read surface: only explicitly public, non-archived records leave D1.
   if(path==='/api/public/content'){
     const publicOrigin=new URL(env.PUBLIC_SITE_URL).origin;
@@ -87,13 +101,13 @@ export async function handle(request,env,fetcher=fetch){
     return json({error:'Not found'},404);
   }
   if(path==='/'||path==='/studio'||path==='/studio/'){
-    if(!await isOwner(request,env))return redirect('/auth/login');
+    if(!await isOwner(request,env))return redirect('/signin');
     const asset=await env.ASSETS.fetch(new Request(new URL('/studio.html',url),request));
     return secureAsset(asset);
   }
   // Never serve the HTML via an unguarded alternate URL.
-  if(path==='/studio.html')return new Response('Not found',{status:404});
-  if(['/studio.js','/studio.css','/theme.js','/style.css','/favicon.svg'].includes(path))return secureAsset(await env.ASSETS.fetch(request));
+  if(path==='/studio.html'||path==='/signin.html')return new Response('Not found',{status:404});
+  if(['/studio.js','/studio.css','/signin.js','/theme.js','/style.css','/favicon.svg'].includes(path))return secureAsset(await env.ASSETS.fetch(request));
   return json({error:'Not found'},404);
 }
 function secureAsset(asset){const headers=new Headers(asset.headers);headers.set('Cache-Control','no-store');headers.set('X-Content-Type-Options','nosniff');headers.set('Referrer-Policy','no-referrer');headers.set('X-Frame-Options','DENY');headers.set('Content-Security-Policy',"default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");return new Response(asset.body,{status:asset.status,headers});}

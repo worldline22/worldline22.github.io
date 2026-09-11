@@ -26,9 +26,13 @@ npm run build
 4. Apply schema: `npx wrangler d1 migrations apply yuchao-content --remote --config worker/wrangler.jsonc`.
 5. Optionally load the CV-derived public entries: `npx wrangler d1 execute yuchao-content --remote --file worker/seed.sql --config worker/wrangler.jsonc`. The seed uses INSERT OR IGNORE, so it never overwrites edits.
 6. Deploy with `npm run worker:deploy` and note the Worker HTTPS origin.
-7. Create a GitHub OAuth App in your GitHub developer settings. Homepage URL: `https://worldline22.github.io`. Callback URL: `<WORKER_ORIGIN>/auth/callback`. The application requests no repository permissions.
-8. Put the OAuth client ID in `worker/wrangler.jsonc` as `GITHUB_CLIENT_ID`. Store the client secret using `npx wrangler secret put GITHUB_CLIENT_SECRET --config worker/wrangler.jsonc`; never put it in site files, Git, or a repository variable.
-9. Deploy the Worker again. Open `<WORKER_ORIGIN>/studio` and sign in as worldline22. Authorization uses the verified numeric GitHub account ID `112759137`, not a browser-supplied username.
+7. Configure immediate owner access with `node scripts/create-access-key.mjs`. The script generates a 256-bit access key, saves it to the ignored `.private/workspace-access-key.txt` file with owner-only permissions, and stores only its SHA-256 hash as a Cloudflare secret. Open `<WORKER_ORIGIN>/signin` and enter that key. Do not commit or share it.
+
+### Optional GitHub sign-in
+
+Create a GitHub OAuth App in your GitHub developer settings. Homepage URL: `https://worldline22.github.io`. Callback URL: `<WORKER_ORIGIN>/auth/callback`. The application requests no repository permissions.
+Put the OAuth client ID in `worker/wrangler.jsonc` as `GITHUB_CLIENT_ID`. Store the client secret using `npx wrangler secret put GITHUB_CLIENT_SECRET --config worker/wrangler.jsonc`; never put it in site files, Git, or a repository variable.
+Deploy the Worker again. Open `<WORKER_ORIGIN>/auth/login` and sign in as worldline22. Authorization uses the verified numeric GitHub account ID `112759137`, not a browser-supplied username.
 
 For local Worker development, apply migrations with `--local` instead of `--remote`, use `npm run worker:dev`, and use a separate development OAuth app/callback. There is no development authentication bypass.
 
@@ -44,12 +48,12 @@ For branch-based Pages deployments, copy only the contents of a built `dist/` to
 
 The owner workspace supports creating and editing projects, papers, and notes, setting public/private visibility, previewing text, and archiving/restoring entries. New entries default to private. Body text supports paragraphs and `##` section headings; HTML is rendered as text. No fabricated research notes are included.
 
-Private data lives only in D1. Every admin request verifies a server-side session. OAuth uses single-use state and PKCE. Sessions use hashed random tokens, a seven-day expiry, Secure/HttpOnly/SameSite cookies, and same-origin checks for mutations. The public API queries only public, non-archived entries, and responses are not cached. No secrets are sent to the frontend. GitHub OAuth tokens are not retained.
+Private data lives only in D1. Every admin request verifies a server-side session. Personal access uses a cryptographically random 256-bit key; only its hash is stored on the server. Optional OAuth uses single-use state and PKCE. Sessions use hashed random tokens, a seven-day expiry, Secure/HttpOnly/SameSite cookies, and same-origin checks for mutations. The public API queries only public, non-archived entries, and responses are not cached. No secrets are sent to the frontend. GitHub OAuth tokens are not retained.
 
 Previously published material, including the supplied CV and public seed data in Git history, cannot be made confidential retroactively. Enter confidential work only through the private workspace. Project visibility does not redact the static CV.
 
 ## Verification
 
-`npm test` exercises owner access, private/public filtering, papers, archived records, immediate privacy changes, OAuth state and PKCE, wrong-account rejection, expired sessions, origin checks, logout, request size limits, and security headers against SQLite. Browser verification should cover desktop/mobile layouts, both themes, project filters, paper navigation, and the CV link. Live OAuth needs the owner's configured GitHub OAuth App.
+`npm test` exercises owner access, private/public filtering, papers, archived records, immediate privacy changes, OAuth state and PKCE, wrong-account rejection, expired sessions, origin checks, logout, request size limits, and security headers against SQLite. Browser verification should cover desktop/mobile layouts, both themes, project filters, paper navigation, and the CV link. Personal-key sign-in works immediately after setup. Optional live OAuth needs the owner's configured GitHub OAuth App.
 
 Reference documentation: [GitHub Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [GitHub OAuth](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps), [Cloudflare Worker asset routing](https://developers.cloudflare.com/workers/static-assets/routing/worker-script/).
