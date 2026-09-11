@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.wrangler/
+.sites-runtime/
+.dev.vars
+.env
+.env.*
+!.env.example
+.DS_Store
+tmp/
+worker/wrangler.local.jsonc
