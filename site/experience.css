@@ -55,3 +55,11 @@ body[data-page=home] .section{margin-bottom:110px}
 }
 
 @media(max-width:370px){.hero-immersive .hero-title{font-size:38px}}
+
+@media(min-width:721px){
+  .hero-stage{min-height:540px}
+  .hero-copy{align-self:center}
+  .hero-immersive .hero-intro{position:absolute;top:100%;left:0;margin-top:30px;width:100%}
+  .architecture-art .hero-affiliation{text-align:center;margin-top:28px}
+}
+@media(max-width:720px){.architecture-art .hero-affiliation{text-align:center;margin-top:28px}}
