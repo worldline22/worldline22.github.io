@@ -18,6 +18,25 @@ npm test
 npm run build
 ```
 
+## Research Library
+
+The main navigation links to `site/library/index.html`, with separate ABCD and
+Torch-Helion collections. Torch-Helion contains six standalone HTML explainers,
+original diagrams, interactive teaching examples, and public source links to
+arXiv and USENIX. No paper PDFs are hosted in this repository.
+ABCD starts with an empty collection.
+
+Edit the paper content in `scripts/library-content.mjs` and the page/diagram
+templates in `scripts/build-library.mjs`, then run `npm run library:build` to
+regenerate the checked-in HTML. Shared presentation and interactions live in
+`site/library.css` and `site/library.js`. The Library works independently of the
+Cloudflare API; all reading content and worked examples are available without
+JavaScript. Interactive toy costs are separate from cited paper results.
+
+`npm run build` includes all nested Library pages and versions their
+shared asset links for GitHub Pages. Preview locally with `npm run dev`, then open
+`http://127.0.0.1:4173/library/index.html`.
+
 ## Cloudflare setup
 
 1. Sign in with `npx wrangler login`.

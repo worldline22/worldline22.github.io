@@ -15,6 +15,15 @@ for(let i=0;i<names.length;i++){
   await writeFile(`dist/${paths.get(names[i])}`,rewrite(contents[i]));
   await rm(`dist/${names[i]}`);
 }
-await writeFile('dist/index.html',rewrite(await readFile('dist/index.html','utf8')));
+// Library articles are standalone HTML documents at nested paths. Update their
+// shared asset references too, including ../../style.css and ../../theme.js.
+async function rewriteDocuments(directory) {
+  for (const entry of await readdir(directory,{withFileTypes:true})) {
+    const path=`${directory}/${entry.name}`;
+    if(entry.isDirectory()) await rewriteDocuments(path);
+    else if(entry.name.endsWith('.html')) await writeFile(path,rewrite(await readFile(path,'utf8')));
+  }
+}
+await rewriteDocuments('dist');
 await writeFile('dist/.nojekyll','');
 console.log(`Built GitHub Pages site in dist/ (${api?'Cloudflare content':'CV-based preview content'}).`);
