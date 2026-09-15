@@ -38,17 +38,18 @@ async function checkLinks(documents) {
 test('Library pages have working local navigation, unique IDs, and public paper sources',async()=>{
   const entries=await files(join(root,'site/library'));
   const documents=entries.filter(file=>file.endsWith('.html'));
-  assert.equal(documents.length,9);
+  assert.equal(documents.length,papers.length+3);
   assert.equal(entries.filter(file=>file.endsWith('.pdf')).length,0);
   await checkLinks(documents);
   for(const paper of papers) {
     const html=await readFile(join(root,`site/library/torch-helion/${paper.id}.html`),'utf8');
     for(const url of [paper.sourceUrl,paper.pdfUrl]) {
       assert.equal(new URL(url).protocol,'https:');
-      assert(['arxiv.org','www.usenix.org'].includes(new URL(url).hostname));
+      assert(['arxiv.org','www.usenix.org','doi.org','dl.acm.org'].includes(new URL(url).hostname));
       assert(html.includes(`href="${url}"`),`Missing public source in ${paper.name}`);
     }
     assert(!html.includes('../pdfs/'));
+    assert(!html.includes('undefined'), `Incomplete explainer: ${paper.name}`);
     assert(!html.includes('/Users/')&&!html.includes('/home/'));
   }
 });

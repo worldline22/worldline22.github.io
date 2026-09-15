@@ -1,5 +1,6 @@
 // Editorial source for the public Library. Examples are deliberately small,
 // invented teaching models; evidence fields describe the supplied PDFs only.
+import { morePapers } from './library-more-papers.mjs';
 export const papers = [
   {
     id:'vtc', name:'VTC', venue:'OSDI 2026', category:'movement', topic:'Avoid copies', time:5,
@@ -174,5 +175,6 @@ export const papers = [
     evidencePage:10,evidenceSections:'§5.2 and Figure 12; §5.7 · LLM scope; §6 · Emulated HBM',
     sourceSections:[['§3 · Two-core compute–shift example',3],['§4 · rTensor and idle/active plans',4],['§§5–6 · Hardware results and limits',9]],
     related:'graphturbo',relatedReason:'Both make memory capacity part of scheduling, at different levels of the architecture.'
-  }
+  },
+  ...morePapers
 ];

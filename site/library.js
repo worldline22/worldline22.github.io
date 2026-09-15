@@ -40,8 +40,73 @@ if(search) {
 const strip=(label,values,dim=false)=>`<div class="data-strip"><span class="strip-label">${label}</span>${values.map(v=>`<span class="cell ${dim?'dim':''}">${v}</span>`).join('')}</div>`;
 const result=text=>`<output class="demo-result">${text}</output>`;
 const costRow=(label,compute,copy,total)=>`<div class="cost-row"><span>${label}</span><div class="cost-track"><span class="cost-segment" style="width:${compute*10}%"></span><span class="cost-segment copy" style="width:${copy*10}%"></span></div><span class="cost-value">${total} units</span></div>`;
+function choose(demo,draw) {
+  const buttons=[...demo.querySelectorAll('[data-choice]')];
+  buttons.forEach(button=>button.addEventListener('click',()=>{
+    buttons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+    draw(button.dataset.choice);
+  }));
+  draw(buttons[0].dataset.choice);
+}
 
 const demos={
+  tileloom(demo,output) {
+    choose(demo,mode=>{
+      const shared=mode==='broadcast';
+      output.innerHTML=`<div class="transfer-source">Off-chip memory · tile A</div><div class="core-grid">${[0,1,2,3].map(i=>`<div class="core"><h4>Core ${i}</h4><div class="weight-piece">Tile A</div><p>${shared&&i?'← On-chip delivery from core 0':'↓ Fetch from off-chip memory'}</p></div>`).join('')}</div>`+
+        result(shared?'1 off-chip fetch + 3 on-chip deliveries':'4 off-chip fetches of the same tile')+
+        '<p class="demo-footnote">Each core gets the same values. This counts logical tile transfers, not network packets or elapsed time. The broadcast needs network support and buffer space.</p>';
+    });
+  },
+  nautilus(demo,output) {
+    choose(demo,mode=>{
+      const both=mode==='both',numerator=both?50:10,denominator=both?3:1;
+      output.innerHTML=strip('Values',both?[10,20]:[10])+strip('Weights',both?[1,2]:[1])+
+        `<div class="core-grid"><div class="core"><h4>Running numerator</h4><div class="weight-piece">${numerator}</div><p>${both?'10 + 2 × 20':'1 × 10'}</p></div><div class="core"><h4>Running denominator</h4><div class="weight-piece gold">${denominator}</div><p>${both?'1 + 2':'1'}</p></div></div>`+
+        result(`Average = ${numerator} / ${denominator} = ${both?'16.67 (rounded)':'10'}`)+
+        `<p class="demo-footnote">${both?'The second value has twice the weight, so a plain average of 10 and 20 would be wrong.':'Add the next item by updating both pieces of state.'} These two running quantities explain a reduction; this is not an implementation of stable attention.</p>`;
+    });
+  },
+  set(demo,output) {
+    choose(demo,mode=>{
+      const spatial=mode==='spatial';
+      output.innerHTML=`<div class="schedule-tree"><span class="tree-root">${spatial?'S':'T'} cut</span><div><span>Task A</span><span>Task B</span></div></div>`+
+        (spatial?strip('Same time',['A<small>core 0</small>','A<small>core 1</small>','B<small>core 2</small>','B<small>core 3</small>']):
+          strip('First',['A<small>core 0</small>','A<small>core 1</small>','A<small>core 2</small>','A<small>core 3</small>'])+strip('Then',['B<small>core 0</small>','B<small>core 1</small>','B<small>core 2</small>','B<small>core 3</small>']))+
+        result(spatial?'Separate core groups: A and B may run together.':'Same core group: A runs, then B runs.')+
+        '<p class="demo-footnote">This picture assigns resources, not durations. Fewer cores can make each task slower. If B depends on A, B must wait for the required data even with an S cut.</p>';
+    });
+  },
+  stream(demo,output) {
+    choose(demo,mode=>{
+      const wait=mode==='busy'?4:0;
+      const ticks=['A','A',...Array(wait).fill('wait'),'→','B','B'];
+      output.innerHTML=`<p class="toy-label">Each box = 1 tick · time moves left to right →</p><div class="tick-timeline">${Array.from({length:9},(_,i)=>`<div class="tick ${ticks[i]==='wait'?'waiting':ticks[i]?'working':''}"><b>${ticks[i]==='wait'?'W':ticks[i]||'·'}</b><small>${i}–${i+1}</small></div>`).join('')}</div><div class="legend-row"><span>A / B: compute</span><span class="copy">W: wait for link</span><span>→: transfer</span></div>`+
+        result(`Finish at tick ${ticks.length}: 2 + ${wait} wait + 1 transfer + 2 = ${ticks.length}`)+
+        `<p class="demo-footnote">Core B starts at tick ${3+wait}, once its input arrives. Compute still takes 4 ticks total; the schedule also pays for movement and waiting.</p>`;
+    });
+  },
+  dato(demo,output) {
+    choose(demo,mode=>{
+      const mismatch=mode==='mismatch';
+      output.innerHTML=strip('Producer',[2,4,6])+`<div class="transfer-source">Typed stream → consumer doubles each value</div>`+
+        strip('Consumer',mismatch?[4,8,12,'?<small>no token</small>']:[4,8,12])+
+        `<div class="contract-counts"><span><b>3</b> sends</span><span aria-hidden="true">${mismatch?'≠':'='}</span><span><b>${mismatch?4:3}</b> reads</span></div>`+
+        result(mismatch?'Mismatch: read 4 has no producer. The toy pipeline would stall.':'Matched: output = [4, 8, 12].')+
+        '<p class="demo-footnote">This closed example assumes successful delivery and enough buffering. Matching counts alone does not establish that a larger task graph is deadlock-free.</p>';
+    });
+  },
+  mirage(demo,output) {
+    choose(demo,mode=>{
+      const expr=mode==='valid'?'A × B + A × C':mode==='invalid'?'A × B + C':'A × (B + C)';
+      const calculation=mode==='valid'?'2 × 3 + 2 × 4 = 6 + 8':mode==='invalid'?'2 × 3 + 4 = 6 + 4':'2 × (3 + 4) = 2 × 7';
+      const value=mode==='invalid'?10:14;
+      output.innerHTML=strip('Inputs',['A = 2','B = 3','C = 4'])+
+        `<div class="expression-card"><span class="toy-label">Candidate expression</span><strong>${expr}</strong><span>${calculation} = ${value}</span></div><div class="core-grid"><div class="core"><h4>Reference output</h4><div class="weight-piece">14</div></div><div class="core"><h4>Candidate output</h4><div class="weight-piece ${value===14?'':'gold'}">${value}</div></div></div>`+
+        result(value===14?'Matches this input. Equivalence still needs general reasoning.':'Reject: 10 ≠ 14. One counterexample is enough.')+
+        '<p class="demo-footnote">Distributivity justifies the valid rewrite over exact real arithmetic. Floating-point rounding can differ. Mirage’s supported randomized algebraic checks do much more than this single scalar example.</p>';
+    });
+  },
   vtc(demo,output) {
     function draw(mode) {
       output.innerHTML=strip('Array A',[10,20,30,40,50,60])+

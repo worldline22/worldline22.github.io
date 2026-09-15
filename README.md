@@ -21,12 +21,12 @@ npm run build
 ## Research Library
 
 The main navigation links to `site/library/index.html`, with separate ABCD and
-Torch-Helion collections. Torch-Helion contains six standalone HTML explainers,
+Torch-Helion collections. Torch-Helion contains twelve standalone HTML explainers,
 original diagrams, interactive teaching examples, and public source links to
-arXiv and USENIX. No paper PDFs are hosted in this repository.
+arXiv, USENIX, and ACM. No paper PDFs are hosted in this repository.
 ABCD starts with an empty collection.
 
-Edit the paper content in `scripts/library-content.mjs` and the page/diagram
+Edit the paper content in `scripts/library-content.mjs` and `scripts/library-more-papers.mjs` and the page/diagram
 templates in `scripts/build-library.mjs`, then run `npm run library:build` to
 regenerate the checked-in HTML. Shared presentation and interactions live in
 `site/library.css` and `site/library.js`. The Library works independently of the
