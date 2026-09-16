@@ -1,5 +1,6 @@
 // Progressive enhancement: every guide, source link, and worked example is
 // already in its HTML. This module only adds controls and shelf filtering.
+import { createAbcdDemos } from './library-abcd.js';
 const themeButton = document.querySelector('#theme-toggle');
 function themeLabel() {
   const dark=document.documentElement.dataset.theme==='dark';
@@ -50,6 +51,7 @@ function choose(demo,draw) {
 }
 
 const demos={
+  ...createAbcdDemos({choose,strip,result}),
   tileloom(demo,output) {
     choose(demo,mode=>{
       const shared=mode==='broadcast';

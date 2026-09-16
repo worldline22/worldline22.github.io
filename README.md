@@ -21,15 +21,18 @@ npm run build
 ## Research Library
 
 The main navigation links to `site/library/index.html`, with separate ABCD and
-Torch-Helion collections. Torch-Helion contains twelve standalone HTML explainers,
-original diagrams, interactive teaching examples, and public source links to
-arXiv, USENIX, and ACM. No paper PDFs are hosted in this repository.
-ABCD starts with an empty collection.
+Torch-Helion collections. Torch-Helion contains twelve standalone HTML explainers;
+ABCD contains seventeen, with MAHL, MACO, HSCO-Bench, and VeriOpt featured first.
+Both collections include original diagrams, interactive teaching examples, and
+public source links. No paper PDFs are hosted in this repository.
 
 Edit the paper content in `scripts/library-content.mjs` and `scripts/library-more-papers.mjs` and the page/diagram
-templates in `scripts/build-library.mjs`, then run `npm run library:build` to
+templates in `scripts/build-library.mjs`. ABCD content, source metadata, and
+diagrams live in `scripts/library-abcd-content.mjs`, `scripts/library-abcd-sources.mjs`,
+and `scripts/library-abcd-visuals.mjs`. Run `npm run library:build` to
 regenerate the checked-in HTML. Shared presentation and interactions live in
-`site/library.css` and `site/library.js`. The Library works independently of the
+`site/library.css` and `site/library.js`, with ABCD demos in `site/library-abcd.js`.
+The Library works independently of the
 Cloudflare API; all reading content and worked examples are available without
 JavaScript. Interactive toy costs are separate from cited paper results.
 
